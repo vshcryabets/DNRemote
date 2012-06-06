@@ -16,6 +16,7 @@ class MouseEventFiles: public MemoryStyxFile {
 private:
 	Display *mDisplay;
 	Window mRootWindow;
+	int mWidth, mHeight;
 public:
 	MouseEventFiles();
 	virtual ~MouseEventFiles();

@@ -13,7 +13,7 @@ using namespace std;
 
 int main(int argc, char **argv) {
 	try {
-		string serveraddr = "127.0.0.1";
+		string serveraddr = "0.0.0.0";
 		MemoryStyxDirectory root ("root");
 		string protocol = "9P2000";
 		root.addFile(new MouseEventFiles());
