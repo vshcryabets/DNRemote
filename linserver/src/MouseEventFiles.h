@@ -8,7 +8,7 @@
 #ifndef MOUSEEVENTFILES_H_
 #define MOUSEEVENTFILES_H_
 
-#include "./vfs/MemoryStyxFile.h"
+#include "vfs/MemoryStyxFile.h"
 #include "X11/Xlib.h"
 #include "X11/Xutil.h"
 

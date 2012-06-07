@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 		MemoryStyxDirectory root ("root");
 		string protocol = "9P2000";
 		root.addFile(new MouseEventFiles());
-		StyxServerManager manager(serveraddr, 8080, &root, &protocol);
+		StyxServerManager manager(serveraddr, 8080, &root, protocol);
 		manager.start();
 	} catch (const char *e) {
 		printf("Exception: %s \n", e);
