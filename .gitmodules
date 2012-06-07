@@ -1,0 +1,3 @@
+[submodule "linserver/V2StyxLib"]
+	path = linserver/V2StyxLib
+	url = git@github.com:vshcryabets/V2StyxLib.git

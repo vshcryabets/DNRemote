@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, DNAndroidClientActivity!</string>
     <string name="app_name">DNAndroidClient</string>
+
+    <!-- ACRA crash text -->
+    <string name="crash_toast_text">К сожалению, во время выполнения данной задачи произошла критическая ошибка. Можете отослать разработчикам информацию об ошибке.</string>
 
 </resources>

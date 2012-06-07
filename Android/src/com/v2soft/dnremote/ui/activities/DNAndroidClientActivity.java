@@ -1,4 +1,4 @@
-package com.v2soft.dnremote;
+package com.v2soft.dnremote.ui.activities;
 
 import android.app.Activity;
 import android.graphics.Point;
@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 
+import com.v2soft.dnremote.R;
+import com.v2soft.dnremote.R.layout;
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
 

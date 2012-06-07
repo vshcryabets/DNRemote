@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="ListView">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+
+    <style name="Layout">
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="Layout.Main">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
+    <style name="Layout.Main.Padding">
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
+        
+    <style name="Layout.WrapVertical">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingBottom">14dp</item>
+    </style>
+
+    <style name="Input">
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Input.Label">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_marginRight">14dp</item>
+    </style>
+
+    <style name="Input.Edit">
+        <item name="android:layout_width">fill_parent</item>
+    </style>
+
+    <style name="TextView">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TextView.Welcome">
+        <item name="android:background">#FFff7c10</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+    </style>
+
+    <style name="TextView.Description">
+        <item name="android:gravity">left</item>
+        <item name="android:textColor">#FFcccccc</item>
+    </style>
+
+    <style name="TextView.JID">
+        <item name="android:inputType">textEmailAddress</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Button.Fill">
+        <item name="android:layout_width">fill_parent</item>
+    </style>
+
+    
+    <style name="Button.Fill.Weigth">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+    
+    <style name="CheckBox">
+<!--         <item name="android:button">@drawable/btn_check</item> -->
+		<item name="android:layout_width">95dp</item>
+		<item name="android:layout_height">29dp</item>
+    </style>
+    
+</resources>
