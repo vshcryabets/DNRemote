@@ -3,7 +3,9 @@ package com.v2soft.dnremote.ui.fragments;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -19,8 +21,11 @@ import android.widget.ListView;
 
 import com.v2soft.dnremote.ApplicationSettings;
 import com.v2soft.dnremote.DNRemoteApplication;
+import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.dao.Server;
+import com.v2soft.dnremote.ui.activities.DNAndroidClientActivity;
+import com.v2soft.dnremote.ui.activities.DesktopsEditorActivity;
 
 import com.v2soft.AndLib.ui.fragments.BaseFragment;
 /**
@@ -34,7 +39,7 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings>
 implements OnItemClickListener {
 
     private static final String LOG_TAG = DesktopsSelectionFragment.class.getSimpleName();
-    
+
     private ArrayAdapter<Server> mAdapter;
     private ListView mListView;
 
@@ -47,18 +52,20 @@ implements OnItemClickListener {
         registerForContextMenu(mListView);
         return view;
     }
-    
+
     public void onResume(){
         super.onResume();
         try {
             final Collection<Server> profiles= mSettings.getProfiles();
+            List<Server> servers = new ArrayList<Server>(profiles);
+            servers.add(0, new Server(getString(R.string.btn_add_new_desktop), "", 0));
             mAdapter = new ArrayAdapter<Server>(getActivity(),
                     R.layout.listitem_serverselection,  
-                    new ArrayList<Server>(profiles));
+                    servers);
             mListView.setAdapter(mAdapter);
-//            if ( profiles.size() < 1 ) {
-//                showDialog(BaseActivity.DIALOG_CREATE_PROFILE);
-//            }
+            //            if ( profiles.size() < 1 ) {
+            //                showDialog(BaseActivity.DIALOG_CREATE_PROFILE);
+            //            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -68,9 +75,16 @@ implements OnItemClickListener {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
             long id) {
-//        final Intent intent = new Intent(this, ProfileSettingsActivity.class);
-//        intent.putExtra(IPCConstants.EXTRA_PROFILE, mAdapter.getItem(position));
-//        startActivity(intent);
+        if ( position == 0 ) {
+            // add new desktop
+            final Intent intent = new Intent(getActivity(), DesktopsEditorActivity.class);
+            startActivity(intent);
+            return;
+        }
+        final Server server = mAdapter.getItem(position);
+        final Intent intent = new Intent(getActivity(), DNAndroidClientActivity.class);
+        intent.putExtra(IPCConstants.EXTRA_SERVER, server);
+        startActivity(intent);
     }
     //============================== Context Menu =======================================
     @Override
@@ -96,7 +110,7 @@ implements OnItemClickListener {
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
-        
+
     }
 }
 

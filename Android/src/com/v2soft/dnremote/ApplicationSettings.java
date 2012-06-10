@@ -1,6 +1,7 @@
 package com.v2soft.dnremote;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Collection;
 
 import android.content.Context;
@@ -28,6 +29,7 @@ public class ApplicationSettings extends BaseApplicationSettings {
     public ApplicationSettings(Context context) {
         super(context);
         mDesktops = new ProfileStorage<Server>(Server.sFactory);
+        loadSettings();
     }
 
     @Override
@@ -44,5 +46,17 @@ public class ApplicationSettings extends BaseApplicationSettings {
 
     public Collection<Server> getProfiles() {
         return mDesktops;
+    }
+
+    @Override
+    public void saveSettings() {
+        try {
+            FileOutputStream out = mContext.openFileOutput("desktops.json", 
+                    Context.MODE_PRIVATE);
+            mDesktops.save(out);
+            out.close();
+        } catch (Exception e) {
+            Log.d(LOG_TAG, e.toString(), e);
+        }
     }
 }

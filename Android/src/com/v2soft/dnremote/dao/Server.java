@@ -3,11 +3,20 @@ package com.v2soft.dnremote.dao;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.v2soft.AndLib.dao.AbstractProfile;
 import com.v2soft.AndLib.dao.JSONSerializable;
 
+/**
+ * Desktop connection parameters
+ * @author vshcryabets@gmail.com
+ *
+ */
 public class Server 
-    extends AbstractProfile {
+    extends AbstractProfile 
+    implements Parcelable {
     // ==========================================================
     // Constants
     // ==========================================================
@@ -44,6 +53,11 @@ public class Server
         mServer = in.getString(KEY_SERVER);
         mPort = in.getInt(KEY_PORT);
     }
+    public Server(Parcel in) {
+        this(in.readString(), in.readString(), in.readInt() );
+    }
+    public String getAddress() {return mServer;}
+    public int getPort() {return mPort;}
     // ==========================================================
     // AbstractProfile methods
     // ==========================================================
@@ -52,5 +66,48 @@ public class Server
         Server server = (Server) profile;
         mServer = server.mServer;
         mPort = server.mPort;
+    }
+    
+    @Override
+    public String toString() {
+        return mName;
+    }
+    // ==========================================================
+    // Parcelable methods
+    // ==========================================================
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mName);
+        dest.writeString(mServer);
+        dest.writeInt(mPort);
+    }
+
+    public static final Parcelable.Creator<Server> CREATOR = 
+            new Parcelable.Creator<Server>() {
+        public Server createFromParcel(Parcel in) {
+            return new Server(in);
+        }
+
+        public Server[] newArray(int size) {
+            return new Server[size];
+        }
+    };
+    public void setAddress(String string) {
+        mServer = string;
+    }
+    //----------------------------------------------------------------
+    // JSON methods
+    //----------------------------------------------------------------
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject result = super.toJSON();
+        result.put(KEY_SERVER, mServer);
+        result.put(KEY_PORT, mPort);
+        return result;
     }
 }

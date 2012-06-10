@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 
+import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.R.layout;
+import com.v2soft.dnremote.dao.Server;
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
 
@@ -25,15 +27,15 @@ public class DNAndroidClientActivity extends Activity {
     private StyxFile mStyxFile;
     private boolean mRelativeMode = true;
 
-    private String mHostName = "192.168.1.5";
-    private int mServerPort = 8080;
     private int mMouseX= TOTAL_WIDTH/2, mMouseY = TOTAL_WIDTH/2;
     private float mOldX, mOldY;
+    private Server mServer;
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mServer = getIntent().getParcelableExtra(IPCConstants.EXTRA_SERVER);
         setContentView(R.layout.main);
         Display display = getWindowManager().getDefaultDisplay();
         mHeight = display.getHeight();
@@ -44,8 +46,8 @@ public class DNAndroidClientActivity extends Activity {
     protected void onResume() {
         // connect to server
         try {
-            mConnection = new StyxClientManager(InetAddress.getByName(mHostName), 
-                    mServerPort, false);
+            mConnection = new StyxClientManager(InetAddress.getByName(mServer.getAddress()), 
+                    mServer.getPort(), false);
             mConnection.connect();
             mStyxFile = new StyxFile(mConnection, "mouse");
             mOut = mStyxFile.openForWrite();
