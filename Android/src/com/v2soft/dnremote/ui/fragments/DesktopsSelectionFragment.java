@@ -4,6 +4,7 @@ package com.v2soft.dnremote.ui.fragments;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -50,25 +51,25 @@ implements OnItemClickListener {
         mListView = (ListView) view.findViewById(R.id.listView);
         mListView.setOnItemClickListener(this);
         registerForContextMenu(mListView);
+        mAdapter = new ArrayAdapter<Server>(getActivity(),
+                R.layout.listitem_serverselection,  
+                new ArrayList<Server>());
+        mListView.setAdapter(mAdapter);
         return view;
+    }
+
+    private void refreshConnectionsList() {
+        final Collection<Server> profiles= mSettings.getProfiles();
+        List<Server> servers = new ArrayList<Server>(profiles);
+        servers.add(0, new Server(UUID.randomUUID(), 
+                getString(R.string.btn_add_new_desktop), "", 0));
+        mAdapter.clear();
+        mAdapter.addAll(servers);
     }
 
     public void onResume(){
         super.onResume();
-        try {
-            final Collection<Server> profiles= mSettings.getProfiles();
-            List<Server> servers = new ArrayList<Server>(profiles);
-            servers.add(0, new Server(getString(R.string.btn_add_new_desktop), "", 0));
-            mAdapter = new ArrayAdapter<Server>(getActivity(),
-                    R.layout.listitem_serverselection,  
-                    servers);
-            mListView.setAdapter(mAdapter);
-            //            if ( profiles.size() < 1 ) {
-            //                showDialog(BaseActivity.DIALOG_CREATE_PROFILE);
-            //            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        refreshConnectionsList();
     }
 
 
@@ -81,10 +82,14 @@ implements OnItemClickListener {
             startActivity(intent);
             return;
         }
-        final Server server = mAdapter.getItem(position);
+        connectToServer(mAdapter.getItem(position));
+    }
+    
+    private void connectToServer(Server server) {
         final Intent intent = new Intent(getActivity(), DNAndroidClientActivity.class);
         intent.putExtra(IPCConstants.EXTRA_SERVER, server);
         startActivity(intent);
+        
     }
     //============================== Context Menu =======================================
     @Override
@@ -101,10 +106,21 @@ implements OnItemClickListener {
 
         switch (item.getItemId()) {
         case R.id.delete_server:
+            mSettings.getProfiles().remove(profile);
+            mSettings.saveSettings();
+            refreshConnectionsList();
+            return true;
+        case R.id.edit_server:
+            final Intent intent = new Intent(getActivity(), DesktopsEditorActivity.class);
+            intent.putExtra(IPCConstants.EXTRA_SERVER, profile);
+            startActivity(intent);            
+            return true;
+        case R.id.connect_server:
+            connectToServer(profile);
             return true;
         default:
             return super.onContextItemSelected(item);
-        }
+        }        
     }
 
     @Override

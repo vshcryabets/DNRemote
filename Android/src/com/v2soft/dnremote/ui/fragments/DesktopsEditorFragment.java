@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
+import java.util.UUID;
+
 import com.v2soft.AndLib.ui.fragments.BaseFragment;
 import com.v2soft.dnremote.ApplicationSettings;
 import com.v2soft.dnremote.DNRemoteApplication;
@@ -31,7 +33,7 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         mServer = server;
         mCreateNew = createNew;
         if ( mCreateNew ) {
-            mServer = new Server("", "", 8080);
+            mServer = new Server(UUID.randomUUID(), "", "", 8080);
         }
     }
 
@@ -62,7 +64,11 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
                 mSettings.getProfiles().add(mServer);
             } else {
                 // update
-//                mSettings.getProfiles().
+                for ( Server server : mSettings.getProfiles() ) {
+                    if ( server.equals(mServer) ) {
+                        server.updateFrom(mServer);
+                    }
+                }
             }
             mSettings.saveSettings();
             getActivity().finish();

@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.UUID;
+
 import com.v2soft.AndLib.dao.AbstractProfile;
 import com.v2soft.AndLib.dao.JSONSerializable;
 
@@ -15,13 +17,14 @@ import com.v2soft.AndLib.dao.JSONSerializable;
  *
  */
 public class Server 
-    extends AbstractProfile 
-    implements Parcelable {
+extends AbstractProfile 
+implements Parcelable {
     // ==========================================================
     // Constants
     // ==========================================================
     protected final static String KEY_SERVER = "server";
     protected final static String KEY_PORT = "port";
+    protected final static String KEY_ID = "id";
     //-----------------------------------------------------------------------
     // Staic fields
     //-----------------------------------------------------------------------    
@@ -31,19 +34,21 @@ public class Server
             return new Server(data);
         }
         public Server create(String name) {
-            return new Server(name, "", 8080);
+            return new Server(UUID.randomUUID(), name, "", 8080);
         }
     };
     // ==========================================================
     // Class fields
     // ==========================================================
+    private UUID mId;
     private String mServer;
     private int mPort;
     // ==========================================================
     // Constructors
     // ==========================================================
-    public Server(String name, String server, int port) {
+    public Server(UUID id, String name, String server, int port) {
         super(name);
+        mId = id;
         mServer = server;
         mPort = port;
     }
@@ -52,9 +57,13 @@ public class Server
         super(in);
         mServer = in.getString(KEY_SERVER);
         mPort = in.getInt(KEY_PORT);
+        mId = UUID.fromString(in.getString(KEY_ID));
     }
     public Server(Parcel in) {
-        this(in.readString(), in.readString(), in.readInt() );
+        this( UUID.fromString(in.readString()),
+                in.readString(), 
+                in.readString(), 
+                in.readInt() );
     }
     public String getAddress() {return mServer;}
     public int getPort() {return mPort;}
@@ -62,12 +71,26 @@ public class Server
     // AbstractProfile methods
     // ==========================================================
     @Override
+    public int hashCode() {
+        return mId.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if ( o.getClass().equals(Server.class)) {
+            return mId.equals(((Server)o).mId);
+        }
+        return false;
+    }
+
+    @Override
     public void updateFrom(AbstractProfile profile) {
         Server server = (Server) profile;
         mServer = server.mServer;
         mPort = server.mPort;
+        mName = server.mName;
     }
-    
+
     @Override
     public String toString() {
         return mName;
@@ -82,6 +105,7 @@ public class Server
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId.toString());
         dest.writeString(mName);
         dest.writeString(mServer);
         dest.writeInt(mPort);

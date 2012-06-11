@@ -8,4 +8,8 @@
     <!-- ACRA crash text -->
     <string name="crash_toast_text">К сожалению, во время выполнения данной задачи произошла критическая ошибка. Можете отослать разработчикам информацию об ошибке.</string>
 
+
+    <string name="menu_connect">Подключиться</string>
+    <string name="menu_edit">Редактировать</string>
+    
 </resources>
