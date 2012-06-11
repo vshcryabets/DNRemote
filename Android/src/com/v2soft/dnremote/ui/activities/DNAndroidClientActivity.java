@@ -28,7 +28,7 @@ public class DNAndroidClientActivity extends Activity {
     private boolean mRelativeMode = true;
 
     private int mMouseX= TOTAL_WIDTH/2, mMouseY = TOTAL_WIDTH/2;
-    private float mOldX, mOldY;
+    private float mOldX, mOldY, mDownX, mDownY;
     private Server mServer;
 
     /** Called when the activity is first created. */
@@ -72,18 +72,42 @@ public class DNAndroidClientActivity extends Activity {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int eventType = event.getAction();
+        float dx;
+        float dy;
         switch (eventType) {
         case MotionEvent.ACTION_DOWN:
             mOldX = event.getX();
             mOldY = event.getY();
-            break;
+            mDownX = mOldX;
+            mDownY = mOldY;
+            return true;
         case MotionEvent.ACTION_UP:
+            dx = Math.abs(event.getX()-mDownX);
+            dy = Math.abs(event.getY()-mDownY);
             mOldX = 0;
             mOldY = 0;
-            break;
+            if ( dx+dy < 10 ) {
+                Log.d(LOG_TAG, "Click!!!!!!!!!!!! ");
+                // click
+                int cmd = 20000;
+                byte [] buffer = new byte[]{
+                        (byte) (cmd & 0xFF),
+                        (byte) ((cmd >> 8) & 0xFF),
+                        (byte) (mMouseY & 0xFF),
+                        (byte) ((mMouseY >> 8) & 0xFF)
+                };
+                try {
+                    mOut.write(buffer);
+                    mOut.flush();
+                } catch (IOException e) {
+                    Log.d(LOG_TAG, e.toString(), e);
+                }                
+            }
+            return true;
+            
         case MotionEvent.ACTION_MOVE:
-            float dx = event.getX()-mOldX;
-            float dy = event.getY()-mOldY;
+            dx = event.getX()-mOldX;
+            dy = event.getY()-mOldY;
             mOldX = event.getX();
             mOldY = event.getY();
             mMouseX += dx*10000/mWidth;
@@ -112,7 +136,7 @@ public class DNAndroidClientActivity extends Activity {
             } catch (IOException e) {
                 Log.d(LOG_TAG, e.toString(), e);
             }
-            break;
+            return true;
         default:
             break;
         }

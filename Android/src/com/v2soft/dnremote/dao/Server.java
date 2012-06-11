@@ -132,6 +132,7 @@ implements Parcelable {
         JSONObject result = super.toJSON();
         result.put(KEY_SERVER, mServer);
         result.put(KEY_PORT, mPort);
+        result.put(KEY_ID, mId.toString());
         return result;
     }
 }
