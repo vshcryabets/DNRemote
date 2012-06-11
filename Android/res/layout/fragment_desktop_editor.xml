@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Layout.Main.Padding" >
+
+    <TextView
+        style="@style/Input.Label"
+        android:text="Имя соединения" />
+
+    <EditText
+        android:id="@+id/editConnectionName"
+        style="@style/Input.Edit" />
+
+    <TextView
+        style="@style/Input.Label"
+        android:text="Адрес" />
+
+    <EditText
+        android:id="@+id/editAddress"
+        style="@style/Input.Edit" />
+
+    <TextView
+        style="@style/Input.Label"
+        android:text="Порт" />
+
+    <EditText
+        android:id="@+id/editPort"
+        style="@style/Input.Edit" />
+
+    <LinearLayout style="@style/Layout.WrapVertical" >
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/btn_cancel" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/btn_save" />
+    </LinearLayout>
+
+</LinearLayout>

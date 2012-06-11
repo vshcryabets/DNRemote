@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DNAndroidClient</string>
+
+    <string name="btn_add_new_desktop">Создать подключение...</string>
+    
+    <!-- ACRA crash text -->
+    <string name="crash_toast_text">К сожалению, во время выполнения данной задачи произошла критическая ошибка. Можете отослать разработчикам информацию об ошибке.</string>
+
+
+    <string name="menu_connect">Подключиться</string>
+    <string name="menu_edit">Редактировать</string>
+    
+</resources>
