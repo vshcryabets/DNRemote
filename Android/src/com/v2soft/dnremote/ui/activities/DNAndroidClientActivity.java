@@ -32,6 +32,7 @@ import java.net.InetAddress;
 import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.R.layout;
+import com.v2soft.dnremote.dao.PointerEvent;
 import com.v2soft.dnremote.dao.Server;
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
@@ -43,7 +44,7 @@ public class DNAndroidClientActivity extends Activity {
     private int mWidth, mHeight;
     private OutputStream mOut;
     private StyxFile mStyxFile;
-    private boolean mRelativeMode = true;
+    private boolean mRelativeMode = false;
 
     private int mMouseX= TOTAL_WIDTH/2, mMouseY = TOTAL_WIDTH/2;
     private float mOldX, mOldY, mDownX, mDownY;
@@ -100,17 +101,52 @@ public class DNAndroidClientActivity extends Activity {
             mDownY = mOldY;
             return true;
         case MotionEvent.ACTION_UP:
-            dx = Math.abs(event.getX()-mDownX);
-            dy = Math.abs(event.getY()-mDownY);
-            mOldX = 0;
-            mOldY = 0;
-            if ( dx+dy < 10 ) {
-                Log.d(LOG_TAG, "Click!!!!!!!!!!!! ");
-                // click
-                int cmd = 20000;
+            //            dx = Math.abs(event.getX()-mDownX);
+            //            dy = Math.abs(event.getY()-mDownY);
+            //            mOldX = 0;
+            //            mOldY = 0;
+            //            if ( dx+dy < 10 ) {
+            //                Log.d(LOG_TAG, "Click!!!!!!!!!!!! ");
+            //                // click
+            //                int cmd = 20000;
+            //                byte [] buffer = new byte[]{
+            //                        (byte) (cmd & 0xFF),
+            //                        (byte) ((cmd >> 8) & 0xFF),
+            //                        (byte) (mMouseY & 0xFF),
+            //                        (byte) ((mMouseY >> 8) & 0xFF)
+            //                };
+            //                try {
+            //                    mOut.write(buffer);
+            //                    mOut.flush();
+            //                } catch (IOException e) {
+            //                    Log.d(LOG_TAG, e.toString(), e);
+            //                }                
+            //            }
+            return true;
+
+        case MotionEvent.ACTION_MOVE:
+            if ( mRelativeMode ) {
+                dx = event.getX()-mOldX;
+                dy = event.getY()-mOldY;
+                mOldX = event.getX();
+                mOldY = event.getY();
+                mMouseX += dx*10000/mWidth;
+                mMouseY += dy*10000/mHeight;
+
+                if ( mMouseX < 0 ) {
+                    mMouseX = 0;
+                } else if ( mMouseX > TOTAL_WIDTH ) {
+                    mMouseX = TOTAL_WIDTH;
+                }
+                if ( mMouseY < 0 ) {
+                    mMouseY = 0;
+                } else if ( mMouseY > TOTAL_WIDTH ) {
+                    mMouseY = TOTAL_WIDTH;
+                }
+
                 byte [] buffer = new byte[]{
-                        (byte) (cmd & 0xFF),
-                        (byte) ((cmd >> 8) & 0xFF),
+                        (byte) (mMouseX & 0xFF),
+                        (byte) ((mMouseX >> 8) & 0xFF),
                         (byte) (mMouseY & 0xFF),
                         (byte) ((mMouseY >> 8) & 0xFF)
                 };
@@ -119,40 +155,22 @@ public class DNAndroidClientActivity extends Activity {
                     mOut.flush();
                 } catch (IOException e) {
                     Log.d(LOG_TAG, e.toString(), e);
+                }
+            } else {
+                mOldX = event.getX();
+                mOldY = event.getY();
+                PointerEvent trEvent = new PointerEvent((short)0, 
+                        PointerEvent.MOVE, 
+                        false, 
+                        (int)(mOldX*10000/mWidth), 
+                        (int)(mOldX*10000/mHeight), 
+                        0);
+                try {
+                    trEvent.write(mOut);
+                    mOut.flush();
+                } catch (IOException e) {
+                    Log.d(LOG_TAG, e.toString(), e);
                 }                
-            }
-            return true;
-            
-        case MotionEvent.ACTION_MOVE:
-            dx = event.getX()-mOldX;
-            dy = event.getY()-mOldY;
-            mOldX = event.getX();
-            mOldY = event.getY();
-            mMouseX += dx*10000/mWidth;
-            mMouseY += dy*10000/mHeight;
-
-            if ( mMouseX < 0 ) {
-                mMouseX = 0;
-            } else if ( mMouseX > TOTAL_WIDTH ) {
-                mMouseX = TOTAL_WIDTH;
-            }
-            if ( mMouseY < 0 ) {
-                mMouseY = 0;
-            } else if ( mMouseY > TOTAL_WIDTH ) {
-                mMouseY = TOTAL_WIDTH;
-            }
-
-            byte [] buffer = new byte[]{
-                    (byte) (mMouseX & 0xFF),
-                    (byte) ((mMouseX >> 8) & 0xFF),
-                    (byte) (mMouseY & 0xFF),
-                    (byte) ((mMouseY >> 8) & 0xFF)
-            };
-            try {
-                mOut.write(buffer);
-                mOut.flush();
-            } catch (IOException e) {
-                Log.d(LOG_TAG, e.toString(), e);
             }
             return true;
         default:

@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 		string serveraddr = "0.0.0.0";
 		MemoryStyxDirectory root ("root");
 		string protocol = "9P2000";
-		root.addFile(new MouseEventFiles());
+		root.addFile(new dnremote::MouseEventFiles());
 		StyxServerManager manager(serveraddr, 8080, &root, protocol);
 		manager.start();
 	} catch (const char *e) {

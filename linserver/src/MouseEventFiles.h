@@ -27,12 +27,22 @@
 #include "vfs/MemoryStyxFile.h"
 #include "X11/Xlib.h"
 #include "X11/Xutil.h"
+#include "EventStruct.h"
 
+namespace dnremote {
 class MouseEventFiles: public MemoryStyxFile {
 private:
 	Display *mDisplay;
 	Window mRootWindow;
 	int mWidth, mHeight;
+	/**
+	 * Load pointer event
+	 */
+	PointerEventStruct loadPointerEvent(uint8_t* data, size_t count);
+	/**
+	 * Load pointer event
+	 */
+	void processPointerEvent(PointerEventStruct event);
 public:
 	MouseEventFiles();
 	virtual ~MouseEventFiles();
@@ -45,5 +55,5 @@ public:
 	 */
 	virtual size_t write(ClientState *client, uint8_t* data, uint64_t offset, size_t count);
 };
-
+}
 #endif /* MOUSEEVENTFILES_H_ */
