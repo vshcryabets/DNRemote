@@ -30,7 +30,7 @@
 using namespace dnremote;
 
 MouseEventFiles::MouseEventFiles() :
-		MemoryStyxFile("mouse"){
+				MemoryStyxFile("mouse"){
 	mDisplay = XOpenDisplay(0);
 	mRootWindow = DefaultRootWindow(mDisplay);
 	XWindowAttributes attrs;
@@ -51,15 +51,15 @@ MouseEventFiles::~MouseEventFiles() {
  * @return
  */
 size_t MouseEventFiles::write(ClientState *client, uint8_t* data, uint64_t offset, size_t count) {
-	printf("cnt %d\n", count);
 	if ( count >= 4 ) {
-		EventTypeEnum type = (EventTypeEnum)data[0+offset];
-		printf("s event %d\n", type);
+		EventTypeEnum type = (EventTypeEnum)data[0];
+//		printf("Got event %d, %d\n", type, offset);
 		switch (type) {
 		case POINTER_EVENT:{
-			printf("Pointer event\n");
-			PointerEventStruct event = loadPointerEvent(data+offset+1, count-1);
-			processPointerEvent(event);
+//			printf("Pointer event\n");
+			PointerEventStruct event;
+			loadPointerEvent(data+1, count-1, &event);
+			processPointerEvent(&event);
 		}
 		break;
 		case HOT_KEY_COMMAND:
@@ -72,36 +72,37 @@ size_t MouseEventFiles::write(ClientState *client, uint8_t* data, uint64_t offse
 /**
  * Process pointer event
  */
-PointerEventStruct MouseEventFiles::loadPointerEvent(uint8_t* data, size_t count) {
+void MouseEventFiles::loadPointerEvent(uint8_t* data, size_t count, PointerEventStruct *event) {
 	if ( count != 9 ) {
 		// wrong event message
 		throw new StyxErrorMessageException(
 				"Wrong event message size. PointerEvent size should be 9 bytes.");
 	}
-	PointerEventStruct event;
-	event.mPointerID = data[0];
+	event->mPointerID = data[0];
 	uint8_t type = data[1];
-	event.mPointerEventType = static_cast<PointerEventTypeEnum>(type);
-	event.mRelative = data[2];
-	event.mX = (data[3] << 8) || data[4];
-	event.mY = (data[5] << 8) || data[6];
-	event.mButtonID = (data[7] << 8) || data[8];
-	return event;
+	PointerEventTypeEnum eventType = (PointerEventTypeEnum)type;
+	event->mPointerEventType = eventType;
+	event->mRelative = data[2];
+	event->mX = (data[3] << 8) | data[4];
+	event->mY = (data[5] << 8) | data[6];
+//	printf("Event %dx%d\n", event->mX, event->mY);
+	event->mButtonID = (data[7] << 8) | data[8];
+	return;
 }
 
 /**
- * Load pointer event
+ * Handle pointer event
  */
-void MouseEventFiles::processPointerEvent(PointerEventStruct event) {
+void MouseEventFiles::processPointerEvent(PointerEventStruct *event) {
 	XEvent xevent;
-	memset(&event, 0x00, sizeof(event));
-	printf("Some event %d\n", event.mPointerEventType);
-	switch (event.mPointerEventType ) {
+	memset(&xevent, 0x00, sizeof(xevent));
+	switch (event->mPointerEventType ) {
 	case MOVE:
-		printf("Move event\n");
-		if ( !event.mRelative) {
-			int newX = mWidth*event.mX/10000;
-			int newY = mHeight*event.mY/10000;
+
+		if ( !event->mRelative) {
+//			printf("Abs.Move event %dx%d\n", event->mX, event->mY);
+			int newX = mWidth*event->mX/10000;
+			int newY = mHeight*event->mY/10000;
 			XWarpPointer(mDisplay, None, mRootWindow, 0, 0, 0, 0, newX, newY);
 			XFlush(mDisplay);
 		} else {

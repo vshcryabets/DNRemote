@@ -163,7 +163,7 @@ public class DNAndroidClientActivity extends Activity {
                         PointerEvent.MOVE, 
                         false, 
                         (int)(mOldX*10000/mWidth), 
-                        (int)(mOldX*10000/mHeight), 
+                        (int)(mOldY*10000/mHeight), 
                         0);
                 try {
                     trEvent.write(mOut);

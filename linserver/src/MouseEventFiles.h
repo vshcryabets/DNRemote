@@ -38,11 +38,11 @@ private:
 	/**
 	 * Load pointer event
 	 */
-	PointerEventStruct loadPointerEvent(uint8_t* data, size_t count);
+	void loadPointerEvent(uint8_t* data, size_t count, PointerEventStruct *event);
 	/**
-	 * Load pointer event
+	 * Handle pointer event
 	 */
-	void processPointerEvent(PointerEventStruct event);
+	void processPointerEvent(PointerEventStruct *event);
 public:
 	MouseEventFiles();
 	virtual ~MouseEventFiles();
