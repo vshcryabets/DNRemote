@@ -30,7 +30,7 @@
 using namespace dnremote;
 
 MouseEventFiles::MouseEventFiles() :
-				MemoryStyxFile("mouse"){
+										MemoryStyxFile("mouse"){
 	mDisplay = XOpenDisplay(0);
 	mRootWindow = DefaultRootWindow(mDisplay);
 	XWindowAttributes attrs;
@@ -53,10 +53,10 @@ MouseEventFiles::~MouseEventFiles() {
 size_t MouseEventFiles::write(ClientState *client, uint8_t* data, uint64_t offset, size_t count) {
 	if ( count >= 4 ) {
 		EventTypeEnum type = (EventTypeEnum)data[0];
-//		printf("Got event %d, %d\n", type, offset);
+		//		printf("Got event %d, %d\n", type, offset);
 		switch (type) {
 		case POINTER_EVENT:{
-//			printf("Pointer event\n");
+			//			printf("Pointer event\n");
 			PointerEventStruct event;
 			loadPointerEvent(data+1, count-1, &event);
 			processPointerEvent(&event);
@@ -85,7 +85,7 @@ void MouseEventFiles::loadPointerEvent(uint8_t* data, size_t count, PointerEvent
 	event->mRelative = data[2];
 	event->mX = (data[3] << 8) | data[4];
 	event->mY = (data[5] << 8) | data[6];
-//	printf("Event %dx%d\n", event->mX, event->mY);
+	//	printf("Event %dx%d\n", event->mX, event->mY);
 	event->mButtonID = (data[7] << 8) | data[8];
 	return;
 }
@@ -100,13 +100,26 @@ void MouseEventFiles::processPointerEvent(PointerEventStruct *event) {
 	case MOVE:
 
 		if ( !event->mRelative) {
-//			printf("Abs.Move event %dx%d\n", event->mX, event->mY);
 			int newX = mWidth*event->mX/10000;
 			int newY = mHeight*event->mY/10000;
 			XWarpPointer(mDisplay, None, mRootWindow, 0, 0, 0, 0, newX, newY);
 			XFlush(mDisplay);
 		} else {
+			Window windowReturned;
+			int pointerX, pointerY;
+			int win_x, win_y;
+			unsigned int mask_return;
+			bool result = XQueryPointer(mDisplay, mRootWindow,
+					&windowReturned,
+					&windowReturned,
+					&pointerX, &pointerY,
+					&win_x, &win_y,
+					&mask_return);
 			// relative move
+			int newX = event->mX+pointerX;
+			int newY = event->mY+pointerY;
+			XWarpPointer(mDisplay, None, mRootWindow, 0, 0, 0, 0, newX, newY);
+			XFlush(mDisplay);
 		}
 		break;
 	case POINTER_DOWN:

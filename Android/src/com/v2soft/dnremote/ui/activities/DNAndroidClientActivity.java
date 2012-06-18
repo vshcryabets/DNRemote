@@ -44,9 +44,8 @@ public class DNAndroidClientActivity extends Activity {
     private int mWidth, mHeight;
     private OutputStream mOut;
     private StyxFile mStyxFile;
-    private boolean mRelativeMode = false;
+    private boolean mRelativeMode = true;
 
-    private int mMouseX= TOTAL_WIDTH/2, mMouseY = TOTAL_WIDTH/2;
     private float mOldX, mOldY, mDownX, mDownY;
     private Server mServer;
 
@@ -130,32 +129,14 @@ public class DNAndroidClientActivity extends Activity {
                 dy = event.getY()-mOldY;
                 mOldX = event.getX();
                 mOldY = event.getY();
-                mMouseX += dx*10000/mWidth;
-                mMouseY += dy*10000/mHeight;
 
-                if ( mMouseX < 0 ) {
-                    mMouseX = 0;
-                } else if ( mMouseX > TOTAL_WIDTH ) {
-                    mMouseX = TOTAL_WIDTH;
-                }
-                if ( mMouseY < 0 ) {
-                    mMouseY = 0;
-                } else if ( mMouseY > TOTAL_WIDTH ) {
-                    mMouseY = TOTAL_WIDTH;
-                }
-
-                byte [] buffer = new byte[]{
-                        (byte) (mMouseX & 0xFF),
-                        (byte) ((mMouseX >> 8) & 0xFF),
-                        (byte) (mMouseY & 0xFF),
-                        (byte) ((mMouseY >> 8) & 0xFF)
-                };
-                try {
-                    mOut.write(buffer);
-                    mOut.flush();
-                } catch (IOException e) {
-                    Log.d(LOG_TAG, e.toString(), e);
-                }
+                PointerEvent trEvent = new PointerEvent((short)0, 
+                        PointerEvent.MOVE, 
+                        true, 
+                        (int)dx, 
+                        (int)dy, 
+                        0);
+                sendEvent(trEvent);
             } else {
                 mOldX = event.getX();
                 mOldY = event.getY();
@@ -165,18 +146,22 @@ public class DNAndroidClientActivity extends Activity {
                         (int)(mOldX*10000/mWidth), 
                         (int)(mOldY*10000/mHeight), 
                         0);
-                try {
-                    trEvent.write(mOut);
-                    mOut.flush();
-                } catch (IOException e) {
-                    Log.d(LOG_TAG, e.toString(), e);
-                }                
+                sendEvent(trEvent);
             }
             return true;
         default:
             break;
         }
         return super.onTouchEvent(event);
+    }
+    
+    private void sendEvent(PointerEvent event) {
+        try {
+            event.write(mOut);
+            mOut.flush();
+        } catch (IOException e) {
+            Log.d(LOG_TAG, e.toString(), e);
+        }                
     }
 
 }
