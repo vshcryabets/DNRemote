@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 
 import java.util.UUID;
@@ -45,12 +46,13 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
     private Server mServer;
     private boolean mCreateNew;
     private EditText mConnectionName, mAddress, mPort;
+    private CheckBox mRelativeCheck;
 
     public DesktopsEditorFragment(Server server, boolean createNew) {
         mServer = server;
         mCreateNew = createNew;
         if ( mCreateNew ) {
-            mServer = new Server(UUID.randomUUID(), "", "", 8080);
+            mServer = new Server(UUID.randomUUID(), "", "", 8080, false);
         }
     }
 
@@ -62,10 +64,12 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         mConnectionName = (EditText) view.findViewById(R.id.editConnectionName);
         mAddress = (EditText) view.findViewById(R.id.editAddress);
         mPort = (EditText) view.findViewById(R.id.editPort);
-
+        mRelativeCheck = (CheckBox) view.findViewById(R.id.checkRelative);
+        
         mConnectionName.setText(mServer.getName());
         mAddress.setText(mServer.getAddress());
         mPort.setText(String.valueOf(mServer.getPort()));
+        mRelativeCheck.setChecked(!mServer.isRelativeMode());
         return view;
     }
 
@@ -76,6 +80,7 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         case R.id.btnSave:
             mServer.setName(mConnectionName.getEditableText().toString());
             mServer.setAddress(mAddress.getEditableText().toString());
+            mServer.setRelative(!mRelativeCheck.isChecked());
             if ( mCreateNew ) {
                 // save new
                 mSettings.getProfiles().add(mServer);

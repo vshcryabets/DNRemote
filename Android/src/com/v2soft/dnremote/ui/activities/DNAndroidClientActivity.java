@@ -19,7 +19,6 @@
 package com.v2soft.dnremote.ui.activities;
 
 import android.app.Activity;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
@@ -31,7 +30,6 @@ import java.net.InetAddress;
 
 import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
-import com.v2soft.dnremote.R.layout;
 import com.v2soft.dnremote.dao.PointerEvent;
 import com.v2soft.dnremote.dao.Server;
 import com.v2soft.styxlib.library.StyxClientManager;
@@ -44,7 +42,7 @@ public class DNAndroidClientActivity extends Activity {
     private int mWidth, mHeight;
     private OutputStream mOut;
     private StyxFile mStyxFile;
-    private boolean mRelativeMode = true;
+    private boolean mRelativeMode;
 
     private float mOldX, mOldY, mDownX, mDownY;
     private Server mServer;
@@ -58,6 +56,7 @@ public class DNAndroidClientActivity extends Activity {
         Display display = getWindowManager().getDefaultDisplay();
         mHeight = display.getHeight();
         mWidth = display.getWidth();
+        mRelativeMode = mServer.isRelativeMode();
     }
 
     @Override
@@ -124,37 +123,35 @@ public class DNAndroidClientActivity extends Activity {
             return true;
 
         case MotionEvent.ACTION_MOVE:
+            PointerEvent trEvent = null;
             if ( mRelativeMode ) {
                 dx = event.getX()-mOldX;
                 dy = event.getY()-mOldY;
                 mOldX = event.getX();
                 mOldY = event.getY();
 
-                PointerEvent trEvent = new PointerEvent((short)0, 
+                trEvent = new PointerEvent((short)0, 
                         PointerEvent.MOVE, 
                         true, 
                         (int)dx, 
                         (int)dy, 
                         0);
-                sendEvent(trEvent);
             } else {
-                mOldX = event.getX();
-                mOldY = event.getY();
-                PointerEvent trEvent = new PointerEvent((short)0, 
+                trEvent = new PointerEvent((short)0, 
                         PointerEvent.MOVE, 
                         false, 
-                        (int)(mOldX*10000/mWidth), 
-                        (int)(mOldY*10000/mHeight), 
+                        (int)(event.getX()*TOTAL_WIDTH/mWidth), 
+                        (int)(event.getY()*TOTAL_WIDTH/mHeight), 
                         0);
-                sendEvent(trEvent);
             }
+            sendEvent(trEvent);
             return true;
         default:
             break;
         }
         return super.onTouchEvent(event);
     }
-    
+
     private void sendEvent(PointerEvent event) {
         try {
             event.write(mOut);

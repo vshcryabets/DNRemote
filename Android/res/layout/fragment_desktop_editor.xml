@@ -20,11 +20,17 @@
 
     <TextView
         style="@style/Input.Label"
-        android:text="Порт" />
+        android:text="@string/edit_port" />
 
     <EditText
         android:id="@+id/editPort"
         style="@style/Input.Edit" />
+    
+    <CheckBox 
+        style="@style/Input.Edit"
+        android:id="@+id/checkRelative"
+        android:text="@string/checkbox_relative"
+        />
 
     <LinearLayout style="@style/Layout.WrapVertical" >
 

@@ -12,4 +12,8 @@
     <string name="menu_connect">Подключиться</string>
     <string name="menu_edit">Редактировать</string>
     
+    <!--  Connection editor -->
+    <string name="checkbox_relative">Использовать абсолютные координаты экрана</string>
+    <string name="edit_port">Порт сервера</string>
+    
 </resources>

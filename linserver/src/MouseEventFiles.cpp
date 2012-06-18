@@ -30,7 +30,7 @@
 using namespace dnremote;
 
 MouseEventFiles::MouseEventFiles() :
-										MemoryStyxFile("mouse"){
+												MemoryStyxFile("mouse"){
 	mDisplay = XOpenDisplay(0);
 	mRootWindow = DefaultRootWindow(mDisplay);
 	XWindowAttributes attrs;
@@ -98,29 +98,16 @@ void MouseEventFiles::processPointerEvent(PointerEventStruct *event) {
 	memset(&xevent, 0x00, sizeof(xevent));
 	switch (event->mPointerEventType ) {
 	case MOVE:
-
 		if ( !event->mRelative) {
 			int newX = mWidth*event->mX/10000;
 			int newY = mHeight*event->mY/10000;
+//			printf("NX=%d, NY=%d", newX, newY);
 			XWarpPointer(mDisplay, None, mRootWindow, 0, 0, 0, 0, newX, newY);
-			XFlush(mDisplay);
 		} else {
-			Window windowReturned;
-			int pointerX, pointerY;
-			int win_x, win_y;
-			unsigned int mask_return;
-			bool result = XQueryPointer(mDisplay, mRootWindow,
-					&windowReturned,
-					&windowReturned,
-					&pointerX, &pointerY,
-					&win_x, &win_y,
-					&mask_return);
 			// relative move
-			int newX = event->mX+pointerX;
-			int newY = event->mY+pointerY;
-			XWarpPointer(mDisplay, None, mRootWindow, 0, 0, 0, 0, newX, newY);
-			XFlush(mDisplay);
+			XWarpPointer(mDisplay, None, None, 0, 0, 0, 0, event->mX, event->mY);
 		}
+		XFlush(mDisplay);
 		break;
 	case POINTER_DOWN:
 		::printf("Down \n");

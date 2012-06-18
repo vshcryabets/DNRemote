@@ -43,6 +43,7 @@ implements Parcelable {
     protected final static String KEY_SERVER = "server";
     protected final static String KEY_PORT = "port";
     protected final static String KEY_ID = "id";
+    protected final static String KEY_RELATIVE = "relative";
     //-----------------------------------------------------------------------
     // Staic fields
     //-----------------------------------------------------------------------    
@@ -52,7 +53,7 @@ implements Parcelable {
             return new Server(data);
         }
         public Server create(String name) {
-            return new Server(UUID.randomUUID(), name, "", 8080);
+            return new Server(UUID.randomUUID(), name, "", 8080, true);
         }
     };
     // ==========================================================
@@ -61,30 +62,37 @@ implements Parcelable {
     private UUID mId;
     private String mServer;
     private int mPort;
+    private boolean mRelative;
     // ==========================================================
     // Constructors
     // ==========================================================
-    public Server(UUID id, String name, String server, int port) {
+    public Server(UUID id, String name, String server, int port,
+            boolean relative) {
         super(name);
         mId = id;
         mServer = server;
         mPort = port;
+        mRelative = relative;
     }
 
     public Server(JSONObject in) throws JSONException {
-        super(in);
-        mServer = in.getString(KEY_SERVER);
-        mPort = in.getInt(KEY_PORT);
-        mId = UUID.fromString(in.getString(KEY_ID));
+        this(UUID.fromString(in.getString(KEY_ID)),
+                in.getString(KEY_NAME),
+                in.getString(KEY_SERVER),
+                in.getInt(KEY_PORT),
+                in.getBoolean(KEY_RELATIVE));
     }
+    
     public Server(Parcel in) {
         this( UUID.fromString(in.readString()),
                 in.readString(), 
                 in.readString(), 
-                in.readInt() );
+                in.readInt(),
+                in.readByte() == 1);
     }
     public String getAddress() {return mServer;}
     public int getPort() {return mPort;}
+    public boolean isRelativeMode() {return mRelative;}
     // ==========================================================
     // AbstractProfile methods
     // ==========================================================
@@ -107,6 +115,7 @@ implements Parcelable {
         mServer = server.mServer;
         mPort = server.mPort;
         mName = server.mName;
+        mRelative = server.mRelative;
     }
 
     @Override
@@ -127,6 +136,7 @@ implements Parcelable {
         dest.writeString(mName);
         dest.writeString(mServer);
         dest.writeInt(mPort);
+        dest.writeByte((byte) (mRelative ? 1 : 0));
     }
 
     public static final Parcelable.Creator<Server> CREATOR = 
@@ -142,6 +152,9 @@ implements Parcelable {
     public void setAddress(String string) {
         mServer = string;
     }
+    public void setRelative(boolean b) {
+        mRelative = b;
+    }    
     //----------------------------------------------------------------
     // JSON methods
     //----------------------------------------------------------------
@@ -151,6 +164,10 @@ implements Parcelable {
         result.put(KEY_SERVER, mServer);
         result.put(KEY_PORT, mPort);
         result.put(KEY_ID, mId.toString());
+        result.put(KEY_RELATIVE, mRelative);
         return result;
     }
+
+
+
 }
