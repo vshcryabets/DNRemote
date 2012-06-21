@@ -19,8 +19,9 @@
 package com.v2soft.dnremote.ui.activities;
 
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 
 import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.ui.fragments.DesktopsSelectionFragment;
@@ -30,7 +31,7 @@ import com.v2soft.dnremote.ui.fragments.DesktopsSelectionFragment;
  *
  */
 public class DesktopsSelectionActivity 
-extends Activity {
+extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,7 +40,7 @@ extends Activity {
         if (savedInstanceState == null) {
             // Do first time initialization -- add fragment.
             DesktopsSelectionFragment newFragment = new DesktopsSelectionFragment();
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.v2andLibFragment, newFragment).commit();
         }        
     }

@@ -26,17 +26,25 @@
 #include "stdio.h"
 #include "EventStruct.h"
 #include "StyxErrorMessageException.h"
+#include "X11/extensions/XTest.h"
 
 using namespace dnremote;
 
-MouseEventFiles::MouseEventFiles() :
-												MemoryStyxFile("mouse"){
+MouseEventFiles::MouseEventFiles() : MemoryStyxFile("mouse"){
 	mDisplay = XOpenDisplay(0);
 	mRootWindow = DefaultRootWindow(mDisplay);
 	XWindowAttributes attrs;
 	XGetWindowAttributes(mDisplay, mRootWindow, &attrs);
 	mWidth = attrs.width;
 	mHeight = attrs.height;
+
+	int eventBase, errorBase, hiVer, loVer;
+    bool result = XTestQueryExtension(mDisplay, &eventBase, &errorBase,
+    		&hiVer, &loVer);
+    if ( !result || hiVer < 2 ) {
+           throw "XTEST extension not supported";
+    }
+
 }
 
 MouseEventFiles::~MouseEventFiles() {
@@ -59,7 +67,7 @@ size_t MouseEventFiles::write(ClientState *client, uint8_t* data, uint64_t offse
 			//			printf("Pointer event\n");
 			PointerEventStruct event;
 			loadPointerEvent(data+1, count-1, &event);
-			processPointerEvent(&event);
+			processPointerEventXLIB(&event);
 		}
 		break;
 		case HOT_KEY_COMMAND:
@@ -93,7 +101,7 @@ void MouseEventFiles::loadPointerEvent(uint8_t* data, size_t count, PointerEvent
 /**
  * Handle pointer event
  */
-void MouseEventFiles::processPointerEvent(PointerEventStruct *event) {
+void MouseEventFiles::processPointerEventXLIB(PointerEventStruct *event) {
 	XEvent xevent;
 	memset(&xevent, 0x00, sizeof(xevent));
 	switch (event->mPointerEventType ) {
@@ -101,84 +109,26 @@ void MouseEventFiles::processPointerEvent(PointerEventStruct *event) {
 		if ( !event->mRelative) {
 			int newX = mWidth*event->mX/10000;
 			int newY = mHeight*event->mY/10000;
-//			printf("NX=%d, NY=%d", newX, newY);
 			XWarpPointer(mDisplay, None, mRootWindow, 0, 0, 0, 0, newX, newY);
 		} else {
 			// relative move
+//			XTestFakeRelativeMotionEvent(mDisplay);
 			XWarpPointer(mDisplay, None, None, 0, 0, 0, 0, event->mX, event->mY);
 		}
 		XFlush(mDisplay);
 		break;
 	case POINTER_DOWN:
-		::printf("Down \n");
-		// LMB click
-		xevent.type = ButtonPress;
-		xevent.xbutton.type = ButtonPress;
-		xevent.xbutton.button = Button1;
-		xevent.xbutton.same_screen = true;
-
-		XQueryPointer(mDisplay,
-				mRootWindow,
-				&xevent.xbutton.root,
-				&xevent.xbutton.window,
-				&xevent.xbutton.x_root,
-				&xevent.xbutton.y_root,
-				&xevent.xbutton.x,
-				&xevent.xbutton.y,
-				&xevent.xbutton.state);
-		xevent.xbutton.subwindow = xevent.xbutton.window;
-
-		// walk down through window hierachy to find youngest child
-		while (xevent.xbutton.subwindow) {
-			xevent.xbutton.window = xevent.xbutton.subwindow;
-			XQueryPointer(mDisplay, xevent.xbutton.window,
-					&xevent.xbutton.root, &xevent.xbutton.subwindow,
-					&xevent.xbutton.x_root, &xevent.xbutton.y_root,
-					&xevent.xbutton.x, &xevent.xbutton.y,
-					&xevent.xbutton.state);
-		}
-
-		// send ButtonPress event to youngest child
-		if (XSendEvent(mDisplay, PointerWindow, True, 0xfff, &xevent) == 0)
-			printf("XSendEvent Failed\n");
+		XTestFakeButtonEvent(mDisplay, event->mButtonID, True, CurrentTime);
 		XFlush(mDisplay);
 		break;
 	case POINTER_UP:
-		::printf("Up \n");
-		// LMB click
-
-		xevent.type = ButtonRelease;
-		xevent.xbutton.type = ButtonRelease;
-		xevent.xbutton.button = Button1;
-		xevent.xbutton.same_screen = true;
-		xevent.xbutton.state = 0x100;
-
-		XQueryPointer(mDisplay,
-				mRootWindow,
-				&xevent.xbutton.root,
-				&xevent.xbutton.window,
-				&xevent.xbutton.x_root,
-				&xevent.xbutton.y_root,
-				&xevent.xbutton.x,
-				&xevent.xbutton.y,
-				&xevent.xbutton.state);
-		xevent.xbutton.subwindow = xevent.xbutton.window;
-
-		// walk down through window hierachy to find youngest child
-		while (xevent.xbutton.subwindow) {
-			xevent.xbutton.window = xevent.xbutton.subwindow;
-			XQueryPointer(mDisplay, xevent.xbutton.window,
-					&xevent.xbutton.root, &xevent.xbutton.subwindow,
-					&xevent.xbutton.x_root, &xevent.xbutton.y_root,
-					&xevent.xbutton.x, &xevent.xbutton.y,
-					&xevent.xbutton.state);
-		}
-
-		// send ButtonPress event to youngest child
-		if (XSendEvent(mDisplay, PointerWindow, True, 0xfff, &xevent) == 0)
-			printf("XSendEvent Failed\n");
-		XFlush(mDisplay);		break;
+		XTestFakeButtonEvent(mDisplay, event->mButtonID, False, CurrentTime);
+		XFlush(mDisplay);
+		break;
 	case POINTER_CLICK:
+		XTestFakeButtonEvent(mDisplay, event->mButtonID, True, CurrentTime);
+		XTestFakeButtonEvent(mDisplay, event->mButtonID, False, 100);
+		XFlush(mDisplay);
 		break;
 	}
 }

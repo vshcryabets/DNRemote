@@ -23,6 +23,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -57,6 +59,10 @@ public class DNAndroidClientActivity extends Activity {
         mHeight = display.getHeight();
         mWidth = display.getWidth();
         mRelativeMode = mServer.isRelativeMode();
+        findViewById(R.id.viewTouchPad).setOnTouchListener(mTouchPadListener);
+        findViewById(R.id.btnLMB).setOnTouchListener(new ButtonTouchListener(1));
+        findViewById(R.id.btnMMB).setOnTouchListener(new ButtonTouchListener(2));
+        findViewById(R.id.btnRMB).setOnTouchListener(new ButtonTouchListener(3));
     }
 
     @Override
@@ -86,71 +92,6 @@ public class DNAndroidClientActivity extends Activity {
         super.onPause();
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        int eventType = event.getAction();
-        float dx;
-        float dy;
-        switch (eventType) {
-        case MotionEvent.ACTION_DOWN:
-            mOldX = event.getX();
-            mOldY = event.getY();
-            mDownX = mOldX;
-            mDownY = mOldY;
-            return true;
-        case MotionEvent.ACTION_UP:
-            //            dx = Math.abs(event.getX()-mDownX);
-            //            dy = Math.abs(event.getY()-mDownY);
-            //            mOldX = 0;
-            //            mOldY = 0;
-            //            if ( dx+dy < 10 ) {
-            //                Log.d(LOG_TAG, "Click!!!!!!!!!!!! ");
-            //                // click
-            //                int cmd = 20000;
-            //                byte [] buffer = new byte[]{
-            //                        (byte) (cmd & 0xFF),
-            //                        (byte) ((cmd >> 8) & 0xFF),
-            //                        (byte) (mMouseY & 0xFF),
-            //                        (byte) ((mMouseY >> 8) & 0xFF)
-            //                };
-            //                try {
-            //                    mOut.write(buffer);
-            //                    mOut.flush();
-            //                } catch (IOException e) {
-            //                    Log.d(LOG_TAG, e.toString(), e);
-            //                }                
-            //            }
-            return true;
-
-        case MotionEvent.ACTION_MOVE:
-            PointerEvent trEvent = null;
-            if ( mRelativeMode ) {
-                dx = event.getX()-mOldX;
-                dy = event.getY()-mOldY;
-                mOldX = event.getX();
-                mOldY = event.getY();
-
-                trEvent = new PointerEvent((short)0, 
-                        PointerEvent.MOVE, 
-                        true, 
-                        (int)dx, 
-                        (int)dy, 
-                        0);
-            } else {
-                trEvent = new PointerEvent((short)0, 
-                        PointerEvent.MOVE, 
-                        false, 
-                        (int)(event.getX()*TOTAL_WIDTH/mWidth), 
-                        (int)(event.getY()*TOTAL_WIDTH/mHeight), 
-                        0);
-            }
-            sendEvent(trEvent);
-            return true;
-        default:
-            break;
-        }
-        return super.onTouchEvent(event);
-    }
 
     private void sendEvent(PointerEvent event) {
         try {
@@ -160,5 +101,98 @@ public class DNAndroidClientActivity extends Activity {
             Log.d(LOG_TAG, e.toString(), e);
         }                
     }
+    // ==============================================================
+    // TouchPad listener
+    // ==============================================================
+    private OnTouchListener mTouchPadListener = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int eventType = event.getAction();
+            float dx;
+            float dy;
+            switch (eventType) {
+            case MotionEvent.ACTION_DOWN:
+                mOldX = event.getX();
+                mOldY = event.getY();
+                mDownX = mOldX;
+                mDownY = mOldY;
+                return true;
+            case MotionEvent.ACTION_UP:
+                dx = Math.abs(event.getX()-mDownX);
+                dy = Math.abs(event.getY()-mDownY);
+                mOldX = 0;
+                mOldY = 0;
+                if ( dx+dy < 10 ) {
+                    Log.d(LOG_TAG, "Click!!!!!!!!!!!! ");
+                    PointerEvent trEvent = new PointerEvent((short)0, 
+                            PointerEvent.POINTER_CLICK, 
+                            false, 
+                            0, 
+                            0, 
+                            1);
+                    sendEvent(trEvent);           
+                }
+                return true;
 
+            case MotionEvent.ACTION_MOVE:
+                PointerEvent trEvent = null;
+                if ( mRelativeMode ) {
+                    dx = event.getX()-mOldX;
+                    dy = event.getY()-mOldY;
+                    mOldX = event.getX();
+                    mOldY = event.getY();
+
+                    trEvent = new PointerEvent((short)0, 
+                            PointerEvent.MOVE, 
+                            true, 
+                            (int)dx, 
+                            (int)dy, 
+                            0);
+                } else {
+                    trEvent = new PointerEvent((short)0, 
+                            PointerEvent.MOVE, 
+                            false, 
+                            (int)(event.getX()*TOTAL_WIDTH/mWidth), 
+                            (int)(event.getY()*TOTAL_WIDTH/mHeight), 
+                            0);
+                }
+                sendEvent(trEvent);
+                return true;
+            default:
+                break;
+            }
+            return false;        
+        }
+    };
+    // ==============================================================
+    // Buttons touch listener
+    // ==============================================================
+    private class ButtonTouchListener implements OnTouchListener {
+        private int mButtonID;
+        public ButtonTouchListener(int buttonID) {
+            mButtonID = buttonID;
+        }
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            int eventType = event.getAction();
+            PointerEvent trEvent;
+            switch (eventType) {
+            case MotionEvent.ACTION_DOWN:
+                trEvent = new PointerEvent((short)0, 
+                        PointerEvent.POINTER_DOWN, 
+                        false, 0, 0, mButtonID);
+                sendEvent(trEvent);                 
+                break;
+            case MotionEvent.ACTION_UP:
+                trEvent = new PointerEvent((short)0, 
+                        PointerEvent.POINTER_UP, 
+                        false, 0, 0, mButtonID);
+                sendEvent(trEvent); 
+                break;
+            default:
+                break;
+            }
+            return false;        
+        }
+    };
 }

@@ -42,7 +42,7 @@ private:
 	/**
 	 * Handle pointer event
 	 */
-	void processPointerEvent(PointerEventStruct *event);
+	void processPointerEventXLIB(PointerEventStruct *event);
 public:
 	MouseEventFiles();
 	virtual ~MouseEventFiles();

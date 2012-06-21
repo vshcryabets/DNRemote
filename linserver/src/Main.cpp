@@ -21,6 +21,7 @@
  */
 #include <string>
 #include "StyxServerManager.h"
+#include "StyxLibraryException.h"
 #include "vfs/MemoryStyxDirectory.h"
 #include "MouseEventFiles.h"
 #include "stdio.h"
@@ -36,5 +37,7 @@ int main(int argc, char **argv) {
 		manager.start();
 	} catch (const char *e) {
 		printf("Exception: %s \n", e);
+	} catch (StyxLibraryException *e) {
+		printf("Exception: %s (ac:%d)\n", e->getMessage().c_str(), e->getAdditionalCode());
 	}
 }

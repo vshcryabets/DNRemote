@@ -19,10 +19,11 @@
 package com.v2soft.dnremote.ui.activities;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 
 import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
@@ -34,7 +35,7 @@ import com.v2soft.dnremote.ui.fragments.DesktopsEditorFragment;
  *
  */
 public class DesktopsEditorActivity 
-extends Activity {
+extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +53,7 @@ extends Activity {
             }
             Fragment newFragment = new DesktopsEditorFragment(
                     server, createNew);
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.v2andLibFragment, newFragment).commit();
         }        
     }

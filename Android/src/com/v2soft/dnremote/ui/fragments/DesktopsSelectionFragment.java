@@ -81,7 +81,10 @@ implements OnItemClickListener {
         servers.add(0, new Server(UUID.randomUUID(), 
                 getString(R.string.btn_add_new_desktop), "", 0, false));
         mAdapter.clear();
-        mAdapter.addAll(servers);
+        for (Server server : servers) {
+            mAdapter.add(server);
+        }
+//        mAdapter.addAll(servers);
     }
 
     public void onResume(){
