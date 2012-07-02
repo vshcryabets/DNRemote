@@ -46,9 +46,9 @@ public class DNRemoteApplication
         }
         super.onCreate();
     }
-    
+
     @Override
-    protected void onCreateSettings(ApplicationSettings settings) {
-        super.onCreateSettings(new ApplicationSettings(this));
+    protected ApplicationSettings createApplicationSettings() {
+        return new ApplicationSettings(this);
     }
 }
