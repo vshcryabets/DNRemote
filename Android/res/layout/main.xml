@@ -32,8 +32,7 @@
         android:id="@+id/viewTouchPad"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="#FF004090" 
-        >
+        android:background="@color/touch_unready" >
     </FrameLayout>
 
 </LinearLayout>

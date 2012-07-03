@@ -18,29 +18,37 @@
 // Boston, MA 02111-1307, USA.
 package com.v2soft.dnremote.ui.activities;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.Display;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnTouchListener;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.util.concurrent.TimeoutException;
+
+import android.app.Activity;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
+import android.widget.ProgressBar;
 
 import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.dao.PointerEvent;
 import com.v2soft.dnremote.dao.Server;
+import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.library.exceptions.StyxException;
 
 public class DNAndroidClientActivity extends Activity {
     private static final String LOG_TAG = DNAndroidClientActivity.class.getSimpleName();
     private static final int TOTAL_WIDTH = 10000; 
-    private StyxClientManager mConnection;
+    private StyxClientConnection mConnection;
     private int mWidth, mHeight;
     private OutputStream mOut;
     private StyxFile mStyxFile;
@@ -48,6 +56,7 @@ public class DNAndroidClientActivity extends Activity {
 
     private float mOldX, mOldY, mDownX, mDownY;
     private Server mServer;
+    private FrameLayout mTouchFrame;
 
     /** Called when the activity is first created. */
     @Override
@@ -59,40 +68,72 @@ public class DNAndroidClientActivity extends Activity {
         mHeight = display.getHeight();
         mWidth = display.getWidth();
         mRelativeMode = mServer.isRelativeMode();
-        findViewById(R.id.viewTouchPad).setOnTouchListener(mTouchPadListener);
+        mTouchFrame = (FrameLayout) findViewById(R.id.viewTouchPad);
+        mTouchFrame.setBackgroundColor(getResources().getColor(R.color.touch_unready));
         findViewById(R.id.btnLMB).setOnTouchListener(new ButtonTouchListener(1));
         findViewById(R.id.btnMMB).setOnTouchListener(new ButtonTouchListener(2));
         findViewById(R.id.btnRMB).setOnTouchListener(new ButtonTouchListener(3));
+        new AsyncConnection(mTouchFrame, mTouchPadListener).execute(new Server[]{mServer});
     }
 
     @Override
-    protected void onResume() {
-        // connect to server
+    protected void onDestroy() {
         try {
-            mConnection = new StyxClientManager(InetAddress.getByName(mServer.getAddress()), 
-                    mServer.getPort(), false);
-            mConnection.connect();
-            mStyxFile = new StyxFile(mConnection, "mouse");
-            mOut = mStyxFile.openForWrite();
+            closeConnection();
         } catch (Exception e) {
             Log.d(LOG_TAG, e.toString(), e);
         }
-        super.onResume();
+        super.onDestroy();
     }
+    // ===============================================================
+    // Async connection
+    // ===============================================================
+    private class AsyncConnection extends AsyncTask<Server, Void, Boolean> {
+        private FrameLayout mTouchFrame;
+        private OnTouchListener mListener;
 
-    @Override
-    protected void onPause() {
-        try {
-            mOut.close();
-            mStyxFile.close();
-            mConnection.close();
-        } catch (Exception e) {
-            Log.d(LOG_TAG, e.toString(), e);
+        public AsyncConnection(FrameLayout frame, OnTouchListener listener) {
+            mTouchFrame = frame;
+            mListener = listener;
         }
-        super.onPause();
-    }
 
+        @Override
+        protected void onPreExecute() {
+            ProgressBar bar = new ProgressBar(mTouchFrame.getContext());
+            mTouchFrame.addView(bar, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, 
+                    LayoutParams.WRAP_CONTENT, 
+                    Gravity.CENTER));
+            super.onPreExecute();
+        }
 
+        @Override
+        protected Boolean doInBackground(Server... params) {
+            // connect to server
+            try {
+                connectToServer(mServer);
+                //                Thread.sleep(5000);
+                return true;
+            } catch (Exception e) {
+                Log.d(LOG_TAG, e.toString(), e);
+            }           
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if ( result ) {
+                mTouchFrame.removeAllViews();
+                mTouchFrame.setOnTouchListener(mListener);
+                mTouchFrame.setBackgroundColor(getResources().getColor(R.color.touch_ready));
+            } else {
+                // TODO show something, about error
+            }
+            super.onPostExecute(result);
+        }
+    };
+    // ===============================================================
+    // Server routines
+    // ===============================================================
     private void sendEvent(PointerEvent event) {
         try {
             event.write(mOut);
@@ -101,6 +142,20 @@ public class DNAndroidClientActivity extends Activity {
             Log.d(LOG_TAG, e.toString(), e);
         }                
     }
+    private void connectToServer(Server server) throws IOException, StyxException, InterruptedException, TimeoutException {
+        mConnection = new StyxClientConnection(InetAddress.getByName(mServer.getAddress()), 
+                mServer.getPort(), false);
+        mConnection.connect();
+        mStyxFile = new StyxFile(mConnection, "mouse");
+        mOut = mStyxFile.openForWrite();       
+    }
+
+    private void closeConnection() throws IOException {
+        mOut.close();
+        mStyxFile.close();
+        mConnection.close();
+    }
+
     // ==============================================================
     // TouchPad listener
     // ==============================================================
