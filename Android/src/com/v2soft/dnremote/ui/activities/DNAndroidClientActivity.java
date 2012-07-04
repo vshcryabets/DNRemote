@@ -20,6 +20,7 @@ package com.v2soft.dnremote.ui.activities;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.concurrent.TimeoutException;
 
@@ -41,7 +42,6 @@ import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.dao.PointerEvent;
 import com.v2soft.dnremote.dao.Server;
 import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 
@@ -61,7 +61,7 @@ public class DNAndroidClientActivity extends Activity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);       
         mServer = getIntent().getParcelableExtra(IPCConstants.EXTRA_SERVER);
         setContentView(R.layout.main);
         Display display = getWindowManager().getDefaultDisplay();
@@ -143,7 +143,22 @@ public class DNAndroidClientActivity extends Activity {
         }                
     }
     private void connectToServer(Server server) throws IOException, StyxException, InterruptedException, TimeoutException {
-        mConnection = new StyxClientConnection(InetAddress.getByName(mServer.getAddress()), 
+        InetAddress addr = null;
+//        if ( mServer.getIPAddr() == null || mServer.getIPAddr().length < 4 ) {
+            addr = InetAddress.getByName(mServer.getAddress());
+//            byte [] ipaddr = addr.getAddress();
+//            if ( ipaddr.length == 4 ) {
+//                addr = new Inet4Addre
+//            } else {
+//                addr = InetAddress.getByAddress("qwew", ipaddr);
+//            }
+//            //            String val = addr.getHostName();
+//            //            System.out.println(val);
+//            mServer.setIPAddr(ipaddr);
+//        } else {
+//            addr = InetAddress.getByAddress(mServer.getAddress(), mServer.getIPAddr());
+//        }
+        mConnection = new StyxClientConnection(addr, 
                 mServer.getPort(), false);
         mConnection.connect();
         mStyxFile = new StyxFile(mConnection, "mouse");
@@ -151,9 +166,18 @@ public class DNAndroidClientActivity extends Activity {
     }
 
     private void closeConnection() throws IOException {
-        mOut.close();
-        mStyxFile.close();
-        mConnection.close();
+        if ( mOut != null ) {
+            mOut.close();
+            mOut = null;
+        }
+        if ( mStyxFile != null ) {
+            mStyxFile.close();
+            mStyxFile = null;
+        }
+        if ( mConnection != null ) {
+            mConnection.close();
+            mConnection = null;
+        }
     }
 
     // ==============================================================

@@ -79,7 +79,7 @@ implements OnItemClickListener {
         final Collection<Server> profiles= mSettings.getProfiles();
         List<Server> servers = new ArrayList<Server>(profiles);
         servers.add(0, new Server(UUID.randomUUID(), 
-                getString(R.string.btn_add_new_desktop), "", 0, false));
+                getString(R.string.btn_add_new_desktop), "", 0, false, null));
         mAdapter.clear();
         for (Server server : servers) {
             mAdapter.add(server);

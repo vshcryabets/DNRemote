@@ -52,7 +52,7 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         mServer = server;
         mCreateNew = createNew;
         if ( mCreateNew ) {
-            mServer = new Server(UUID.randomUUID(), "", "", 8080, false);
+            mServer = new Server(UUID.randomUUID(), "", "", 8080, false, null);
         }
     }
 

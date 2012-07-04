@@ -45,7 +45,7 @@ implements Parcelable {
     protected final static String KEY_ID = "id";
     protected final static String KEY_RELATIVE = "relative";
     //-----------------------------------------------------------------------
-    // Staic fields
+    // Static fields
     //-----------------------------------------------------------------------    
     public static final JSONSerializable.Factory<Server> sFactory = new Factory<Server>() {
         @Override
@@ -53,7 +53,7 @@ implements Parcelable {
             return new Server(data);
         }
         public Server create(String name) {
-            return new Server(UUID.randomUUID(), name, "", 8080, true);
+            return new Server(UUID.randomUUID(), name, "", 8080, true, null);
         }
     };
     // ==========================================================
@@ -63,16 +63,18 @@ implements Parcelable {
     private String mServer;
     private int mPort;
     private boolean mRelative;
+    private byte [] mIPAddr; // some phones too long resolves ip adress from ip string, this variable is to resolve this problem
     // ==========================================================
     // Constructors
     // ==========================================================
     public Server(UUID id, String name, String server, int port,
-            boolean relative) {
+            boolean relative, byte[] addr) {
         super(name);
         mId = id;
         mServer = server;
         mPort = port;
         mRelative = relative;
+        mIPAddr = addr;
     }
 
     public Server(JSONObject in) throws JSONException {
@@ -80,7 +82,8 @@ implements Parcelable {
                 in.getString(KEY_NAME),
                 in.getString(KEY_SERVER),
                 in.getInt(KEY_PORT),
-                in.getBoolean(KEY_RELATIVE));
+                in.getBoolean(KEY_RELATIVE),
+                null);
     }
     
     public Server(Parcel in) {
@@ -88,11 +91,32 @@ implements Parcelable {
                 in.readString(), 
                 in.readString(), 
                 in.readInt(),
-                in.readByte() == 1);
+                in.readByte() == 1,
+                readIPAddr(in));
     }
+    private static byte[] readIPAddr(Parcel in) {
+        int count = in.readInt();
+        byte [] res = new byte[count];
+        in.readByteArray(res);
+        return res;
+    }
+
     public String getAddress() {return mServer;}
     public int getPort() {return mPort;}
     public boolean isRelativeMode() {return mRelative;}
+    
+    public void setIPAddr(byte [] mIPAddr) {
+        this.mIPAddr = mIPAddr;
+    }
+    public void setAddress(String string) {
+        mServer = string;
+    }
+    public void setRelative(boolean b) {
+        mRelative = b;
+    }
+    public byte [] getIPAddr() {
+        return mIPAddr;
+    }
     // ==========================================================
     // AbstractProfile methods
     // ==========================================================
@@ -137,6 +161,12 @@ implements Parcelable {
         dest.writeString(mServer);
         dest.writeInt(mPort);
         dest.writeByte((byte) (mRelative ? 1 : 0));
+        if ( mIPAddr != null ) {
+            dest.writeInt(mIPAddr.length);
+            dest.writeByteArray(mIPAddr);
+        } else {
+            dest.writeInt(0);
+        }
     }
 
     public static final Parcelable.Creator<Server> CREATOR = 
@@ -149,12 +179,7 @@ implements Parcelable {
             return new Server[size];
         }
     };
-    public void setAddress(String string) {
-        mServer = string;
-    }
-    public void setRelative(boolean b) {
-        mRelative = b;
-    }    
+
     //----------------------------------------------------------------
     // JSON methods
     //----------------------------------------------------------------
@@ -167,7 +192,5 @@ implements Parcelable {
         result.put(KEY_RELATIVE, mRelative);
         return result;
     }
-
-
 
 }
