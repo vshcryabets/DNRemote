@@ -1,5 +1,6 @@
 <resources>
 
-    <color name="touch_unready">#FF900000</color>
+    <color name="touch_unready">#FF606060</color>
     <color name="touch_ready">#FF009090</color>
+    <color name="touch_error">#FF900000</color>
 </resources>

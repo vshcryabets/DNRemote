@@ -64,8 +64,8 @@ public class DNAndroidClientActivity extends Activity {
         mServer = getIntent().getParcelableExtra(IPCConstants.EXTRA_SERVER);
         setContentView(R.layout.main);
         Display display = getWindowManager().getDefaultDisplay();
-        mHeight = display.getHeight();
-        mWidth = display.getWidth();
+        mHeight = 0;
+        mWidth = 0;
         mRelativeMode = mServer.isRelativeMode();
         mTouchFrame = (FrameLayout) findViewById(R.id.viewTouchPad);
         mTouchFrame.setBackgroundColor(getResources().getColor(R.color.touch_unready));
@@ -110,11 +110,10 @@ public class DNAndroidClientActivity extends Activity {
             // connect to server
             try {
                 connectToServer(mServer);
-                //                Thread.sleep(5000);
                 return true;
             } catch (Exception e) {
                 Log.d(LOG_TAG, e.toString(), e);
-            }           
+            }
             return false;
         }
 
@@ -125,7 +124,8 @@ public class DNAndroidClientActivity extends Activity {
                 mTouchFrame.setOnTouchListener(mListener);
                 mTouchFrame.setBackgroundColor(getResources().getColor(R.color.touch_ready));
             } else {
-                // TODO show something, about error
+            	mTouchFrame.removeAllViews();
+            	mTouchFrame.setBackgroundColor(getResources().getColor(R.color.touch_error));
             }
             super.onPostExecute(result);
         }
@@ -200,7 +200,7 @@ public class DNAndroidClientActivity extends Activity {
                 dy = Math.abs(event.getY()-mDownY);
                 mOldX = 0;
                 mOldY = 0;
-                if ( dx+dy < 10 ) {
+                if ( dx+dy < 20 ) {
                     Log.d(LOG_TAG, "Click!!!!!!!!!!!! ");
                     PointerEvent trEvent = new PointerEvent((short)0, 
                             PointerEvent.POINTER_CLICK, 
@@ -227,6 +227,10 @@ public class DNAndroidClientActivity extends Activity {
                             (int)dy, 
                             0);
                 } else {
+                	if ( mWidth == 0 ) {
+                		mWidth = v.getWidth();
+                		mHeight = v.getHeight();
+                	}
                     trEvent = new PointerEvent((short)0, 
                             PointerEvent.MOVE, 
                             false, 
