@@ -38,7 +38,8 @@
     </style>
 
     <style name="Input.Edit">
-        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:singleLine">true</item>
     </style>
 
     <style name="TextView">

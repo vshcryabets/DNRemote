@@ -20,7 +20,6 @@ package com.v2soft.dnremote.ui.activities;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.concurrent.TimeoutException;
 
@@ -47,7 +46,7 @@ import com.v2soft.styxlib.library.exceptions.StyxException;
 
 public class DNAndroidClientActivity extends Activity {
     private static final String LOG_TAG = DNAndroidClientActivity.class.getSimpleName();
-    private static final int TOTAL_WIDTH = 10000; 
+    private static final int TOTAL_WIDTH = 65535; 
     private StyxClientConnection mConnection;
     private int mWidth, mHeight;
     private OutputStream mOut;

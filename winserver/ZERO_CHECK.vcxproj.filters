@@ -18,10 +18,10 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{AFD6FAD8-D148-4A3E-9477-B16F2B3837B6}</UniqueIdentifier>
+      <UniqueIdentifier>{F1E45612-236D-40F9-9D73-84E318846269}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Documents and Settings\Admin\git\DNRemote\linserver\CMakeFiles\ZERO_CHECK" />
+    <None Include="C:\Users\mrco\git\DNRemote\winserver\CMakeFiles\ZERO_CHECK" />
   </ItemGroup>
 </Project>

@@ -51,7 +51,7 @@ struct PointerEventStruct {
 	uint8_t mPointerID;
 	PointerEventTypeEnum mPointerEventType;
 	bool mRelative;
-	int16_t mX, mY;
+	uint16_t mX, mY;
 	uint16_t mButtonID;
 };
 

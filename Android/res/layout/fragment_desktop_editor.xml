@@ -1,52 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/Layout.Main.Padding" >
 
-    <TextView
-        style="@style/Input.Label"
-        android:text="Имя соединения" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/editConnectionName"
-        style="@style/Input.Edit" />
+        <TextView
+            style="@style/Input.Label"
+            android:text="@string/label_name" />
 
-    <TextView
-        style="@style/Input.Label"
-        android:text="Адрес" />
+        <EditText
+            android:id="@+id/editConnectionName"
+            style="@style/Input.Edit" 
+            android:inputType="textNoSuggestions"/>
 
-    <EditText
-        android:id="@+id/editAddress"
-        style="@style/Input.Edit" />
+        <TextView
+            style="@style/Input.Label"
+            android:text="@string/label_address" />
 
-    <TextView
-        style="@style/Input.Label"
-        android:text="@string/edit_port" />
+        <EditText
+            android:id="@+id/editAddress"
+            style="@style/Input.Edit" 
+            android:inputType="textNoSuggestions"/>
 
-    <EditText
-        android:id="@+id/editPort"
-        style="@style/Input.Edit" />
-    
-    <CheckBox 
-        style="@style/Input.Edit"
-        android:id="@+id/checkRelative"
-        android:text="@string/checkbox_relative"
-        />
+        <TextView
+            style="@style/Input.Label"
+            android:text="@string/edit_port" />
 
-    <LinearLayout style="@style/Layout.WrapVertical" >
+        <EditText
+            android:id="@+id/editPort"
+            style="@style/Input.Edit" 
+            android:inputType="number"/>
 
-        <Button
-            android:id="@+id/btnCancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/btn_cancel" />
+        <CheckBox
+            android:id="@+id/checkRelative"
+            style="@style/Input.Edit"
+            android:text="@string/checkbox_relative" />
 
-        <Button
-            android:id="@+id/btnSave"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:text="@string/btn_save" />
+        <LinearLayout style="@style/Layout.WrapVertical" >
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/btn_cancel" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="@string/btn_save" />
+        </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

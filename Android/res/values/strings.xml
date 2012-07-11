@@ -3,7 +3,7 @@
 
     <string name="app_name">DNAndroidClient</string>
 
-    <string name="btn_add_new_desktop">Создать подключение...</string>
+    <string name="btn_add_new_desktop">Создать подключение&#8230;</string>
     
     <!-- ACRA crash text -->
     <string name="crash_toast_text">К сожалению, во время выполнения данной задачи произошла критическая ошибка. Можете отослать разработчикам информацию об ошибке.</string>
@@ -16,4 +16,7 @@
     <string name="checkbox_relative">Использовать абсолютные координаты экрана</string>
     <string name="edit_port">Порт сервера</string>
     
+    <!-- Connection editor -->
+    <string name="label_name">Имя соединения</string>
+    <string name="label_address">Адрес</string>
 </resources>

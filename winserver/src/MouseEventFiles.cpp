@@ -89,11 +89,7 @@ void MouseEventFiles::processPointerEventWin32(PointerEventStruct *event) {
 	switch (event->mPointerEventType ) {
 	case MOVE:
 		if ( !event->mRelative) {
-			int newX = mWidth*event->mX/10000;
-			int newY = mHeight*event->mY/10000;
-			//XWarpPointer(mDisplay, None, mRootWindow, 0, 0, 0, 0, newX, newY);
-		} else {
-			long fScreenWidth	    = GetSystemMetrics( SM_CXSCREEN ) - 1; 
+long fScreenWidth	    = GetSystemMetrics( SM_CXSCREEN ) - 1; 
 			long fScreenHeight	    = GetSystemMetrics( SM_CYSCREEN ) - 1; 
 			// http://msdn.microsoft.com/en-us/library/ms646260(VS.85).aspx
 			// If MOUSEEVENTF_ABSOLUTE value is specified, dx and dy contain normalized absolute coordinates between 0 and 65,535.
@@ -101,16 +97,21 @@ void MouseEventFiles::processPointerEventWin32(PointerEventStruct *event) {
 			// Coordinate (0,0) maps onto the upper-left corner of the display surface, (65535,65535) maps onto the lower-right corner.
 			//float fx		        = mp.x * ( 65535.0f / fScreenWidth  );
 			//float fy		        = mp.y * ( 65535.0f / fScreenHeight );		  
-				
+			INPUT Input             = { 0 };			
+			Input.type		        = INPUT_MOUSE;
+			Input.mi.dwFlags	    = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+			Input.mi.dx		        = event->mX;
+			Input.mi.dy		        = event->mY;
+			SendInput(1,&Input,sizeof(INPUT));
+			printf("dx=%d, dy=%d\n", event->mX, event->mY);
+		} else {
+			// relative move
 			INPUT Input             = { 0 };			
 			Input.type		        = INPUT_MOUSE;
 			Input.mi.dwFlags	    = MOUSEEVENTF_MOVE;
 			Input.mi.dx		        = event->mX;
 			Input.mi.dy		        = event->mY;
-
 			SendInput(1,&Input,sizeof(INPUT));
-			// relative move
-			//mouse_event(MOUSEEVENTF_MOVE, event->mX, event->mY, 0, 0);
 		}
 		break;
 	case POINTER_DOWN:

@@ -18,7 +18,6 @@
 // Boston, MA 02111-1307, USA.
 package com.v2soft.dnremote.ui.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -51,9 +50,8 @@ extends FragmentActivity {
                 server = bundle.getParcelable(IPCConstants.EXTRA_SERVER);
                 createNew = false;
             }
-            Fragment newFragment = new DesktopsEditorFragment(
-                    server, createNew);
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            final Fragment newFragment = DesktopsEditorFragment.newInstance(server, createNew);
+            final FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.v2andLibFragment, newFragment).commit();
         }        
     }

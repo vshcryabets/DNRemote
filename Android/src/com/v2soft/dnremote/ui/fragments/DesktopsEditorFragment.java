@@ -19,6 +19,7 @@
 package com.v2soft.dnremote.ui.fragments;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import com.v2soft.AndLib.ui.fragments.BaseFragment;
 import com.v2soft.dnremote.ApplicationSettings;
 import com.v2soft.dnremote.DNRemoteApplication;
+import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.dao.Server;
 /**
@@ -42,23 +44,34 @@ public class DesktopsEditorFragment
 extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
 
     private static final String LOG_TAG = DesktopsEditorFragment.class.getSimpleName();
+	private static final String KEY_CREATE_NEW = "";
 
     private Server mServer;
-    private boolean mCreateNew;
     private EditText mConnectionName, mAddress, mPort;
     private CheckBox mRelativeCheck;
+    private boolean mCreateNew;
 
-    public DesktopsEditorFragment(Server server, boolean createNew) {
-        mServer = server;
-        mCreateNew = createNew;
-        if ( mCreateNew ) {
-            mServer = new Server(UUID.randomUUID(), "", "", 8080, false, null);
-        }
+    public static Fragment newInstance(Server server, boolean createNew) {
+    	DesktopsEditorFragment result = new DesktopsEditorFragment();
+    	Bundle params = new Bundle();
+    	params.putParcelable(IPCConstants.EXTRA_SERVER, server);
+    	params.putBoolean(KEY_CREATE_NEW, createNew);
+    	result.setArguments(params);
+    	return result;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+    	Bundle data = getArguments();
+    	if ( savedInstanceState != null ) {
+    		data = getArguments();
+    	}
+    	mServer = data.getParcelable(IPCConstants.EXTRA_SERVER);
+    	mCreateNew = data.getBoolean(KEY_CREATE_NEW);
+    	if ( mCreateNew  ) {
+    		 mServer = new Server(UUID.randomUUID(), "", "", 8080, false, null);
+    	}
         View view = inflater.inflate(R.layout.fragment_desktop_editor, null);
         registerOnClickListener(new int[]{R.id.btnCancel, R.id.btnSave}, view);
         mConnectionName = (EditText) view.findViewById(R.id.editConnectionName);
@@ -73,6 +86,13 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         return view;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+    	outState.putParcelable(IPCConstants.EXTRA_SERVER, mServer);
+    	outState.putBoolean(KEY_CREATE_NEW, mCreateNew);
+    	super.onSaveInstanceState(outState);
+    }
+    
     @Override
     public void onClick(View arg0) {
         int id = arg0.getId();
