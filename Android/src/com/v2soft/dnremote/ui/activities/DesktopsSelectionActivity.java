@@ -18,7 +18,6 @@
 // Boston, MA 02111-1307, USA.
 package com.v2soft.dnremote.ui.activities;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -42,7 +41,7 @@ extends FragmentActivity {
             DesktopsSelectionFragment newFragment = new DesktopsSelectionFragment();
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.add(R.id.v2andLibFragment, newFragment).commit();
-        }        
+        }
     }
 }
 

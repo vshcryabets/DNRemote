@@ -18,10 +18,12 @@
 // Boston, MA 02111-1307, USA.
 package com.v2soft.dnremote.ui.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
 import com.v2soft.dnremote.IPCConstants;
@@ -39,7 +41,7 @@ extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.v2andlib_single_fragment);
-        
+        FragmentManager.enableDebugLogging(true);
         if (savedInstanceState == null) {
             Intent intent = getIntent();
             Bundle bundle = intent.getExtras();
