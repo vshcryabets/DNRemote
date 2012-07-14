@@ -25,6 +25,8 @@
 #include "vfs/MemoryStyxDirectory.h"
 #include "MouseEventFiles.h"
 #include "stdio.h"
+#include <pthread.h>
+#include "UdpListener.h"
 using namespace std;
 
 int main(int argc, char **argv) {
@@ -33,6 +35,11 @@ int main(int argc, char **argv) {
 		MemoryStyxDirectory root ("root");
 		string protocol = "9P2000";
 		root.addFile(new dnremote::MouseEventFiles());
+		pthread_t udpThread;
+		int err = pthread_create(&udpThread, NULL, &listenUDP, NULL);
+		if ( err != 0 ) {
+		    throw "Can't create UDP listen tread";
+		}
 		StyxServerManager manager(serveraddr, 8080, &root, protocol);
 		manager.start();
 	} catch (const char *e) {
