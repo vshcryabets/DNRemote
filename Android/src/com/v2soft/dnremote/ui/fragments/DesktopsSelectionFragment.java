@@ -133,20 +133,19 @@ implements OnItemClickListener {
         case R.id.edit_server:
             final Intent intent = new Intent(getActivity(), DesktopsEditorActivity.class);
             intent.putExtra(IPCConstants.EXTRA_SERVER, profile);
-            startActivity(intent);            
+            startActivity(intent);
             return true;
         case R.id.connect_server:
             connectToServer(profile);
             return true;
         default:
             return super.onContextItemSelected(item);
-        }        
+        }
     }
 
     @Override
     public void onClick(View arg0) {
         // TODO Auto-generated method stub
-
     }
 }
 
