@@ -19,6 +19,7 @@
 package com.v2soft.dnremote.ui.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,7 @@ import com.v2soft.dnremote.DNRemoteApplication;
 import com.v2soft.dnremote.IPCConstants;
 import com.v2soft.dnremote.R;
 import com.v2soft.dnremote.dao.Server;
+import com.v2soft.dnremote.ui.activities.DesktopsScanActivity;
 /**
  * Desktop editor fragment
  * @author vshcryabets@gmail.com
@@ -46,11 +48,12 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
     private static final String LOG_TAG = DesktopsEditorFragment.class.getSimpleName();
     private static final String KEY_CREATE_NEW = "";
     private static final String TAG = "TAG_PROGRESDIALOG";
+    private static final int REQUEST_SCAN = 1;
     private Server mServer;
     private EditText mConnectionName, mAddress, mPort;
     private CheckBox mRelativeCheck;
     private boolean mCreateNew;
-    private ProgressDialogFragment mProgressDialogFragment;
+//    private ProgressDialogFragment mProgressDialogFragment;
 
     public static Fragment newInstance(Server server, boolean createNew) {
         DesktopsEditorFragment result = new DesktopsEditorFragment();
@@ -74,7 +77,7 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
             mServer = new Server(UUID.randomUUID(), "", "", 8080, false, null);
         }
         View view = inflater.inflate(R.layout.fragment_desktop_editor, null);
-        registerOnClickListener(new int[]{R.id.btnCancel, R.id.btnSave}, view);
+        registerOnClickListener(new int[]{R.id.btnCancel, R.id.btnSave, R.id.btnScan}, view);
         mConnectionName = (EditText) view.findViewById(R.id.editConnectionName);
         mAddress = (EditText) view.findViewById(R.id.editAddress);
         mPort = (EditText) view.findViewById(R.id.editPort);
@@ -85,11 +88,11 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         mPort.setText(String.valueOf(mServer.getPort()));
         mRelativeCheck.setChecked(!mServer.isRelativeMode());
 
-        mProgressDialogFragment = (ProgressDialogFragment) getFragmentManager().findFragmentByTag(TAG);
-        if ( mProgressDialogFragment == null ) {
-            mProgressDialogFragment = ProgressDialogFragment.newInstance("Загрузка друзей из Facebook");
-            mProgressDialogFragment.show(getFragmentManager(), TAG);
-        }
+//        mProgressDialogFragment = (ProgressDialogFragment) getFragmentManager().findFragmentByTag(TAG);
+//        if ( mProgressDialogFragment == null ) {
+//            mProgressDialogFragment = ProgressDialogFragment.newInstance("Загрузка друзей из Facebook");
+//            mProgressDialogFragment.show(getFragmentManager(), TAG);
+//        }
         
         return view;
     }
@@ -126,6 +129,9 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         case R.id.btnCancel:
             getActivity().finish();
             break;
+        case R.id.btnScan:
+            startActivityForResult(new Intent(getActivity(), DesktopsScanActivity.class), 
+                    REQUEST_SCAN);
         default:
             break;
         }
