@@ -40,10 +40,10 @@ implements Parcelable {
     // ==========================================================
     // Constants
     // ==========================================================
-    protected final static String KEY_SERVER = "server";
-    protected final static String KEY_PORT = "port";
-    protected final static String KEY_ID = "id";
-    protected final static String KEY_RELATIVE = "relative";
+    public final static String KEY_SERVER = "server";
+    public final static String KEY_PORT = "port";
+    public final static String KEY_ID = "id";
+    public final static String KEY_RELATIVE = "relative";
     //-----------------------------------------------------------------------
     // Static fields
     //-----------------------------------------------------------------------    
@@ -67,6 +67,9 @@ implements Parcelable {
     // ==========================================================
     // Constructors
     // ==========================================================
+    public Server() {
+        super();
+    }
     public Server(UUID id, String name, String server, int port,
             boolean relative, byte[] addr) {
         super(name);
@@ -116,6 +119,12 @@ implements Parcelable {
     }
     public byte [] getIPAddr() {
         return mIPAddr;
+    }
+    public void setPort(int value) {
+        mPort = value;
+    }
+    public void setId(UUID id) {
+        mId = id;
     }
     // ==========================================================
     // AbstractProfile methods
@@ -192,5 +201,6 @@ implements Parcelable {
         result.put(KEY_RELATIVE, mRelative);
         return result;
     }
+
 
 }

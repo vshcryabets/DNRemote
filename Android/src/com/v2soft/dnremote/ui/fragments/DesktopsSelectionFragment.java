@@ -55,9 +55,6 @@ import com.v2soft.AndLib.ui.fragments.BaseFragment;
 public class DesktopsSelectionFragment 
 extends BaseFragment<DNRemoteApplication, ApplicationSettings>
 implements OnItemClickListener {
-
-    private static final String LOG_TAG = DesktopsSelectionFragment.class.getSimpleName();
-
     private ArrayAdapter<Server> mAdapter;
     private ListView mListView;
 

@@ -28,6 +28,7 @@
 #include "netinet/ip.h"
 #include "errno.h"
 #include "unistd.h"
+#include "uuid/uuid.h"
 bool stopUDPThread;
 const char* gRequest = "DNRemoteServer?";
 
@@ -38,9 +39,14 @@ void stopListenUDP() {
 void* listenUDP(void* arg) {
     stopUDPThread = false;
     char answerBuffer[1024];
-    char preBuffer[1024];
-    gethostname(preBuffer, sizeof(preBuffer));
-    sprintf(answerBuffer,"{\"server\":\"DNR\", \"hostname\":\"%s\"}", preBuffer);
+    char hostNameBuffer[1024], uuidBuffer[128];
+    uuid_t uuid;
+    uuid_generate(uuid);
+    uuid_unparse(uuid, uuidBuffer);
+    gethostname(hostNameBuffer, sizeof(hostNameBuffer));
+    sprintf(answerBuffer,"{\"servertype\":\"DNR\", \"name\":\"%s\",\"port\":8080, \"id\":\"%s\"}", 
+	hostNameBuffer,
+	uuidBuffer );
     int sockFD = -1;
     try {
 	printf("Answer: %s\n", answerBuffer);

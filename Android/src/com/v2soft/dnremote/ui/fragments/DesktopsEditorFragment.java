@@ -18,6 +18,7 @@
 // Boston, MA 02111-1307, USA.
 package com.v2soft.dnremote.ui.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,10 +45,7 @@ import com.v2soft.dnremote.ui.activities.DesktopsScanActivity;
 
 public class DesktopsEditorFragment 
 extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
-
-    private static final String LOG_TAG = DesktopsEditorFragment.class.getSimpleName();
-    private static final String KEY_CREATE_NEW = "";
-    private static final String TAG = "TAG_PROGRESDIALOG";
+    private static final String KEY_CREATE_NEW = "new";
     private static final int REQUEST_SCAN = 1;
     private Server mServer;
     private EditText mConnectionName, mAddress, mPort;
@@ -82,19 +80,15 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         mAddress = (EditText) view.findViewById(R.id.editAddress);
         mPort = (EditText) view.findViewById(R.id.editPort);
         mRelativeCheck = (CheckBox) view.findViewById(R.id.checkRelative);
+        fillUI();
+        return view;
+    }
 
+    private void fillUI() {
         mConnectionName.setText(mServer.getName());
         mAddress.setText(mServer.getAddress());
         mPort.setText(String.valueOf(mServer.getPort()));
         mRelativeCheck.setChecked(!mServer.isRelativeMode());
-
-//        mProgressDialogFragment = (ProgressDialogFragment) getFragmentManager().findFragmentByTag(TAG);
-//        if ( mProgressDialogFragment == null ) {
-//            mProgressDialogFragment = ProgressDialogFragment.newInstance("Загрузка друзей из Facebook");
-//            mProgressDialogFragment.show(getFragmentManager(), TAG);
-//        }
-        
-        return view;
     }
 
     @Override
@@ -135,6 +129,15 @@ extends BaseFragment<DNRemoteApplication, ApplicationSettings> {
         default:
             break;
         }
+    }
+    
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if ( requestCode == REQUEST_SCAN && resultCode == Activity.RESULT_OK ) {
+            mServer = data.getParcelableExtra(IPCConstants.EXTRA_SERVER);
+            fillUI();
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
 

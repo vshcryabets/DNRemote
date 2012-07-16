@@ -48,8 +48,9 @@
             android:inputType="number" />
 
         <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/checkRelative"
-            style="@style/Input.Edit"
             android:text="@string/checkbox_relative" />
 
         <LinearLayout style="@style/Layout.WrapVertical" >
