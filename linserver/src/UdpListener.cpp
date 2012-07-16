@@ -69,7 +69,7 @@ void* listenUDP(void* arg) {
 		(struct sockaddr*) &serv, &sock_len);
 	    // answer
 	    buffer[read] = 0;
-	    printf("Recv=%s, %d, %d\n", buffer, read, requestLength);
+	    printf("Recv=%s\n", buffer);
 	    if ( read == requestLength && ( strncmp(buffer, gRequest, requestLength) == 0 ) ) {
 		printf("Send answer\n");
 		sendto(sockFD, answerBuffer, answerLength, 0, (struct sockaddr*) &serv, sock_len );
