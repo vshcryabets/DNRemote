@@ -1,7 +1,7 @@
 /*
- * UdpListener.h
+ * AppSettings.h
  *
- *  Created on: Jul 14, 2012
+ *  Created on: Jul 15, 2012
  *
  * Copyright (C) 2012 V.Shcryabets (vshcryabets@gmail.com)
  * Author:  Vladimir Shcryabets <vshcryabets@gmail.com>
@@ -21,29 +21,37 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef UDPLISTENER_H_
-#define UDPLISTENER_H_
-#include "AppSettings.h"
+#ifndef APPSETTINGS_H_
+#define APPSETTINGS_H_
+
+#include "uuid/uuid.h"
+#include "stdlib.h"
+#include <string>
 
 namespace dnremote {
-class UdpListener {
+class AppSettings {
 private:
-    static const char* INPUT_REQUEST;
-    static const char* KEY_SERVERTYPE;
-
-    bool mStopUDPThread;
-    AppSettings *mSettings;
-
+    uuid_t	mServerId;
+    int		mPort;
+    const char* mConfFilePath;
+    std::string mHostname;
 public:
-    UdpListener(AppSettings *settings);
-    virtual ~UdpListener();
-    // start listen UDP port
-    void start();
-    // stop listen UDP port
-    void stop();
-    void run();
+    static const char* KEY_ID;
+    static const char* KEY_PORT;
+    static const char* KEY_NAME;
+
+    AppSettings(const char* confpath);
+    virtual ~AppSettings();
+    /**
+     * Write configuration to file
+     */
+    void write();
+    // returns the server ID
+    uuid_t* getServerID();
+    // returns server port
+    int getPort();
+    // returns host name
+    std::string getHostName();
 };
 }
-void* listenUDP(void* arg);
-
-#endif /* UDPLISTENER_H_ */
+#endif /* APPSETTINGS_H_ */

@@ -29,62 +29,96 @@
 #include "errno.h"
 #include "unistd.h"
 #include "uuid/uuid.h"
-bool stopUDPThread;
-const char* gRequest = "DNRemoteServer?";
+#include "UdpListener.h"
+#include <pthread.h>
+#include "json/json.h"
+#include <string>
 
-void stopListenUDP() {
-    stopUDPThread = true;
+using namespace dnremote;
+
+const char* UdpListener::INPUT_REQUEST = "DNRemoteServer?";
+const char* UdpListener::KEY_SERVERTYPE = "servertype";
+
+
+void* gUDPThread( void *ptr ) {
+    UdpListener *listener = (UdpListener*)ptr;
+    listener->run();
+    return NULL;
 }
 
-void* listenUDP(void* arg) {
-    stopUDPThread = false;
-    char answerBuffer[1024];
-    char hostNameBuffer[1024], uuidBuffer[128];
-    uuid_t uuid;
-    uuid_generate(uuid);
-    uuid_unparse(uuid, uuidBuffer);
-    gethostname(hostNameBuffer, sizeof(hostNameBuffer));
-    sprintf(answerBuffer,"{\"servertype\":\"DNR\", \"name\":\"%s\",\"port\":8080, \"id\":\"%s\"}", 
-	hostNameBuffer,
-	uuidBuffer );
+UdpListener::UdpListener(AppSettings *settings) {
+    mSettings = settings;
+}
+
+UdpListener::~UdpListener() {
+    stop();
+}
+
+void UdpListener::start() {
+    pthread_t udpThread;
+    int err = pthread_create(&udpThread, NULL, &gUDPThread, (void*)this);
+    if ( err != 0 ) {
+        throw "Can't create UDP listen thread";
+    }
+}
+
+void UdpListener::stop() {
+    mStopUDPThread = true;
+}
+
+void UdpListener::run() {
+    mStopUDPThread = false;
+    Json::Value root;
+    char uuidBuffer[128];
+    uuid_unparse((*mSettings->getServerID()), uuidBuffer);
+
+    root[AppSettings::KEY_PORT] = mSettings->getPort();
+    root[AppSettings::KEY_ID] = uuidBuffer;
+    root[KEY_SERVERTYPE] = "DNR";
+    root[AppSettings::KEY_NAME] = mSettings->getHostName();
+    Json::StyledWriter writer;
+    std::string answer = writer.write(root);
     int sockFD = -1;
     try {
-	printf("Answer: %s\n", answerBuffer);
-	int requestLength = strlen(gRequest);
-	int answerLength = strlen(answerBuffer);
-	// create UDP socket
-	sockFD = socket(AF_INET, SOCK_DGRAM, 0);
-	if ( sockFD < 0 ) {
-	    throw "Can't create UDP socket";
-	}
-	struct sockaddr_in serv;
-	memset(&serv, 0, sizeof(serv));
-	serv.sin_family = AF_INET;
-	serv.sin_addr.s_addr = htonl(INADDR_ANY);
-	serv.sin_port = htons(1235);
-	// bind
-	int res = bind(sockFD, (struct sockaddr*)&serv, sizeof(serv));
-	if ( res != 0 ) {
-	    throw "Can't bind socket";
-	}
-	socklen_t sock_len = sizeof(serv);
-	while ( !stopUDPThread ) {
-	    char buffer[1024];
-	    // read client
-	    ssize_t read = recvfrom(sockFD, buffer, sizeof(buffer)-1, 0, 
-		(struct sockaddr*) &serv, &sock_len);
-	    // answer
-	    buffer[read] = 0;
-	    printf("Recv=%s\n", buffer);
-	    if ( read == requestLength && ( strncmp(buffer, gRequest, requestLength) == 0 ) ) {
-		printf("Send answer\n");
-		sendto(sockFD, answerBuffer, answerLength, 0, (struct sockaddr*) &serv, sock_len );
-	    }
-	}
+        printf("Answer: %s\n", answer.c_str());
+        int requestLength = strlen(INPUT_REQUEST);
+        // create UDP socket
+        sockFD = socket(AF_INET, SOCK_DGRAM, 0);
+        if ( sockFD < 0 ) {
+            throw "Can't create UDP socket";
+        }
+        struct sockaddr_in serv;
+        memset(&serv, 0, sizeof(serv));
+        serv.sin_family = AF_INET;
+        serv.sin_addr.s_addr = htonl(INADDR_ANY);
+        serv.sin_port = htons(1235);
+        // bind
+        int res = bind(sockFD, (struct sockaddr*)&serv, sizeof(serv));
+        if ( res != 0 ) {
+            throw "Can't bind socket";
+        }
+        socklen_t sock_len = sizeof(serv);
+        while ( !mStopUDPThread ) {
+            char buffer[1024];
+            // read client
+            ssize_t read = recvfrom(sockFD, buffer, sizeof(buffer)-1, 0,
+                    (struct sockaddr*) &serv, &sock_len);
+            // answer
+            buffer[read] = 0;
+            printf("Recv=%s\n", buffer);
+            if ( read == requestLength && ( strncmp(buffer, INPUT_REQUEST, requestLength) == 0 ) ) {
+                printf("Send answer\n");
+                sendto(sockFD, answer.c_str(), answer.length(), 0,
+                        (struct sockaddr*) &serv, sock_len );
+            }
+        }
     } catch (const char *e) {
-    	printf("Exception: %s (%d)\n", e, errno);
+        printf("Exception: %s (%d)\n", e, errno);
     }
     if ( sockFD != -1 ) {
-	close(sockFD);
+        close(sockFD);
     }
+    return;
 }
+
+

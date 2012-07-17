@@ -1,4 +1,4 @@
-#Thu Jun 14 22:02:56 EEST 2012
+#Tue Jul 17 14:16:43 EEST 2012
 eclipse.preferences.version=1
 org.eclipse.cdt.core.formatter.alignment_for_arguments_in_method_invocation=16
 org.eclipse.cdt.core.formatter.alignment_for_assignment=16
@@ -158,6 +158,6 @@ org.eclipse.cdt.core.formatter.keep_then_statement_on_same_line=false
 org.eclipse.cdt.core.formatter.lineSplit=80
 org.eclipse.cdt.core.formatter.number_of_empty_lines_to_preserve=1
 org.eclipse.cdt.core.formatter.put_empty_statement_on_new_line=true
-org.eclipse.cdt.core.formatter.tabulation.char=tab
+org.eclipse.cdt.core.formatter.tabulation.char=space
 org.eclipse.cdt.core.formatter.tabulation.size=4
 org.eclipse.cdt.core.formatter.use_tabs_only_for_leading_indentations=false
