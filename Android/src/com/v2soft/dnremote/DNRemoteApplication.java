@@ -19,16 +19,11 @@
 package com.v2soft.dnremote;
 
 import org.acra.ACRA;
-import org.acra.ReportingInteractionMode;
 import org.acra.annotation.ReportsCrashes;
 
 import com.v2soft.AndLib.application.BaseApplication;
 
-@ReportsCrashes(formKey = "",
-mailTo = "info@2vsoft.com",
-mode = ReportingInteractionMode.TOAST,
-resToastText = R.string.crash_toast_text)
-
+@ReportsCrashes(mailTo="info@2vsoft.com", formKey = "6989db82-d69d-44c4-ba2f-3f65cd912097")
 public class DNRemoteApplication 
     extends BaseApplication<ApplicationSettings> {
     //-----------------------------------------------------------------------
