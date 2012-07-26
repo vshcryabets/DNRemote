@@ -1,11 +1,26 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT(DNRemoteServer)
-
-INCLUDE_DIRECTORIES( ../server/libs/V2StyxLib/native/V2StyxLib/include ../server/libs/jsoncpp/include )
+SET(LIBS_DIR ../server/libs/)
+INCLUDE_DIRECTORIES( ${LIBS_DIR}V2StyxLib/native/V2StyxLib/include ${LIBS_DIR}jsoncpp/include )
 
 ADD_DEFINITIONS(-g -O0 -fsigned-char -freg-struct-return -Wall)
 
-ADD_SUBDIRECTORY( src bin )
-ADD_SUBDIRECTORY( ../server/libs/V2StyxLib/native/V2StyxLib/lib bin )
-ADD_SUBDIRECTORY( ../server/libs/jsoncpp/src/lib_json bin )
+#ADD_SUBDIRECTORY( src bin )
+ADD_SUBDIRECTORY( ${LIBS_DIR}V2StyxLib/native/V2StyxLib/lib bin )
+ADD_SUBDIRECTORY( ${LIBS_DIR}jsoncpp/src/lib_json bin )
+
+AUX_SOURCE_DIRECTORY( ./src SOURCES )
+FIND_PACKAGE(Threads REQUIRED)
+FIND_PACKAGE(X11 REQUIRED)
+#FIND_PACKAGE(Xtst REQUIRED)
+#FIND_PACKAGE(uuid REQUIRED)
+
+# Build of the program
+ADD_EXECUTABLE( DNRemoteServer ${SOURCES} )
+TARGET_LINK_LIBRARIES(DNRemoteServer V2StyxServerLibrary X11 Xtst uuid jsoncpp ${CMAKE_THREAD_LIBS_INIT})
+
+# Installation of the program
+INSTALL(TARGETS DNRemoteServer
+        DESTINATION "bin"
+        PERMISSIONS OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
